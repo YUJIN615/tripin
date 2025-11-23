@@ -1,6 +1,7 @@
 "use client";
 import { useEffect } from "react";
 import { MapPin } from "lucide-react";
+import Link from "next/link";
 import { Layout } from "@/components/common/Layout";
 import { SearchInput } from "@/components/make/SearchAreaInput";
 import { SearchList } from "@/components/make/SearchAreaList";
@@ -27,10 +28,13 @@ export const MakePage = () => {
         <SearchList type="search" SearchItems={searchItems} />
       ) : (
         <>
-          <button className="flex items-center gap-[4px] text-[12px] ml-[16px] my-[8px] px-[8px] py-[6px] rounded-[12px] text-[#666] bg-white border border-gray-300">
+          <Link
+            href="/map"
+            className="flex items-center gap-[4px] w-[fit-content] text-[12px] ml-[16px] my-[8px] pl-[8px] pr-[10px] py-[6px] rounded-[12px] text-[#666] bg-white border border-gray-300"
+          >
             <MapPin className="w-4 h-4" color="skyblue" />
             지도로 보기
-          </button>
+          </Link>
           <SearchHistoryList SearchHistoryItems={searchHistory} />
         </>
       )}
