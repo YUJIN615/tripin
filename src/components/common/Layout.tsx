@@ -8,16 +8,11 @@ interface LayoutProps {
   title?: string;
 }
 
-export const Layout = ({
-  children,
-  title,
-  showBottomNav = true,
-  className = "",
-}: LayoutProps) => {
+export const Layout = ({ children, title, showBottomNav = true, className = "" }: LayoutProps) => {
   return (
     <div className={className}>
       <Header title={title} />
-      {children}
+      <div className="px-4 pt-4 pb-16">{children}</div>
       {showBottomNav && <BottomNav />}
     </div>
   );

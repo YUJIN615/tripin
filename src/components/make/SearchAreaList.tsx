@@ -1,4 +1,5 @@
-import { SearchCheck, X } from "lucide-react";
+import { XMarkIcon } from "@heroicons/react/24/solid";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { SearchItemType, SearchListType } from "@/types/make";
 import { useMakeStore } from "@/stores/makeStore";
 
@@ -26,16 +27,16 @@ export const SearchItem = ({ item, type }: SearchItemProps) => {
   return (
     <li
       key={item.id}
-      className="flex items-center justify-between gap-[px] w-full py-[8px] cursor-pointer hover:bg-gray-50 rounded-lg transition-colors"
+      className="flex items-center justify-between w-full py-[8px] cursor-pointer hover:bg-gray-50 rounded-lg transition-colors"
       onClick={handleClick}
     >
-      <div className="flex items-center gap-[8px]">
-        <SearchCheck className="w-5 h-5" color="#666" />
+      <div className="flex items-center gap-2">
+        <MagnifyingGlassIcon className="w-5 h-5" color="#666" />
         <div className="text-[14px] text-gray-600">{item.name}</div>
       </div>
       {type === "history" && (
         <button className="p-[4px] hover:bg-gray-200 rounded" onClick={handleRemove}>
-          <X className="w-4 h-4" />
+          <XMarkIcon className="w-4 h-4" />
         </button>
       )}
     </li>
@@ -49,7 +50,7 @@ type SearchListProps = {
 
 export const SearchList = ({ type, SearchItems = [] }: SearchListProps) => {
   return (
-    <ul className="flex flex-col w-full bg-white px-[24px]">
+    <ul className="flex flex-col gap-1 w-full bg-white px-1">
       {SearchItems.map((item) => (
         <SearchItem key={item.id} item={item} type={type} />
       ))}

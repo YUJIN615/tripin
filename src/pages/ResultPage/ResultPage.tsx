@@ -2,7 +2,7 @@ import { Layout } from "@/components/common/Layout";
 
   export const ResultPage = () => {
   return (
-    <Layout title="내 일정">
+    <Layout title="일정 생성 결과">
       <h1>ResultPage</h1>
     </Layout>
   );

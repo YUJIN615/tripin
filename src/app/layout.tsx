@@ -13,8 +13,8 @@ const notoSansKr = Noto_Sans_KR({
 });
 
 export const metadata: Metadata = {
-  title: 'TripIn',
-  description: '나만의 여행 일정 자동 생성 앱',
+  title: "TripIn",
+  description: "나만의 여행 일정 자동 생성 앱"
 };
 
 export default function RootLayout({
