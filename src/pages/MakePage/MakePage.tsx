@@ -1,62 +1,116 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { DateRange, DayPicker } from "react-day-picker";
+import { DayPicker } from "react-day-picker";
 import { ko } from "react-day-picker/locale";
+import { useMakeStore } from "@/stores/makeStore";
 import { Layout } from "@/components/common/Layout";
+import { hasValue } from "@/utils/common";
 import { TRIP_TYPES, PERSON_COUNT, TRANSPORT_TYPES } from "@/constants";
 import "react-day-picker/style.css";
 
 export const MakePage = () => {
+  const calendarRef = useRef<HTMLDivElement>(null);
+
   const [isOpenCalendar, setIsOpenCalendar] = useState(false);
-  const [range, setRange] = useState<DateRange>();
-  const [personCount, setPersonCount] = useState<number>(PERSON_COUNT.DEFAULT);
-  const [selectedTripTypes, setSelectedTripTypes] = useState<string[]>([]);
-  const [selectedTransports, setSelectedTransports] = useState<string[]>([]);
+
+  const region = useMakeStore((state) => state.region);
+  const date = useMakeStore((state) => state.date);
+  const personCount = useMakeStore((state) => state.personCount);
+  const selectedTripTypes = useMakeStore((state) => state.selectedTripTypes);
+  const selectedTransports = useMakeStore((state) => state.selectedTransports);
+
+  const setDate = useMakeStore((state) => state.setDate);
+  const setPersonCount = useMakeStore((state) => state.setPersonCount);
+  const setSelectedTripTypes = useMakeStore((state) => state.setSelectedTripTypes);
+  const setSelectedTransports = useMakeStore((state) => state.setSelectedTransports);
+
+  const clearAll = useMakeStore((state) => state.clearAll);
+  const makeTrip = useMakeStore((state) => state.makeTrip);
 
   // 여행 타입 토글 함수
   const toggleTripType = (value: string) => {
-    setSelectedTripTypes((prev) =>
-      prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]
+    setSelectedTripTypes(
+      selectedTripTypes.includes(value)
+        ? selectedTripTypes.filter((v) => v !== value)
+        : [...selectedTripTypes, value]
     );
   };
 
   // 이동 수단 토글 함수
   const toggleTransport = (value: string) => {
-    setSelectedTransports((prev) =>
-      prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]
+    setSelectedTransports(
+      selectedTransports.includes(value)
+        ? selectedTransports.filter((v) => v !== value)
+        : [...selectedTransports, value]
     );
   };
+
+  const toggleCalendar = () => {
+    setIsOpenCalendar((prev) => !prev);
+  };
+
+  // 외부 클릭 감지
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (calendarRef.current && !calendarRef.current.contains(event.target as Node)) {
+        setIsOpenCalendar(false);
+      }
+    };
+
+    if (isOpenCalendar) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpenCalendar]);
+
+  useEffect(() => {
+    return () => {
+      clearAll();
+    };
+  }, [clearAll]);
 
   return (
     <Layout title="새 일정">
       <div className="mb-8">
-        <h3 className="text-base font-bold mb-3">장소</h3>
+        <h3 className="text-base font-bold mb-3">지역</h3>
         <Link
           href="/search"
           className="flex items-center gap-2 border border-gray-300 rounded-xl px-3 p-3 bg-white"
         >
-          <div className="text-sm text-gray-400">장소를 입력해주세요.</div>
+          <div className={`text-sm ${hasValue(region) ? "text-gray-700" : "text-gray-400"}`}>
+            {hasValue(region) ? region : "지역을 입력해주세요."}
+          </div>
         </Link>
       </div>
-      <div className="mb-8">
+      <div ref={calendarRef} className="mb-8">
         <h3 className="text-base font-bold mb-3">날짜</h3>
         <div
           className="flex items-center gap-2 h-12 cursor-pointer border border-gray-300 rounded-xl px-3 text-sm text-gray-700 placeholder:text-gray-400"
-          onClick={() => setIsOpenCalendar((prev) => !prev)}
+          onClick={toggleCalendar}
         >
-          {range ? (
+          {date ? (
             <div className="flex items-center gap-2">
-              <div className="text-gray-700">{range?.from?.toLocaleDateString()}</div>
+              <div className="text-gray-700">{date?.from?.toLocaleDateString()}</div>
               <div>~</div>
-              <div className="text-gray-700">{range?.to?.toLocaleDateString()}</div>
+              <div className="text-gray-700">{date?.to?.toLocaleDateString()}</div>
             </div>
           ) : (
             <div className="text-gray-400">날짜를 선택해주세요.</div>
           )}
         </div>
         {isOpenCalendar && (
-          <DayPicker animate mode="range" selected={range} onSelect={setRange} locale={ko} />
+          <div ref={calendarRef} className="mt-4">
+            <DayPicker
+              mode="range"
+              selected={date}
+              onSelect={(value) => setDate(value)}
+              locale={ko}
+            />
+          </div>
         )}
       </div>
       <div className="mb-8">
@@ -123,9 +177,19 @@ export const MakePage = () => {
           ))}
         </div>
       </div>
-      <div className="flex items-center justify-between gap-2 pt-4 pb-8">
-        <button className="w-2/6 h-12 bg-gray-200 text-gray-600 rounded-xl text-sm">초기화</button>
-        <button className="w-4/6 h-12 bg-blue-500 text-white rounded-xl text-sm">검색</button>
+      <div className="flex items-center justify-between gap-2 pt-4 pb-4">
+        <button
+          className="w-2/6 h-12 bg-gray-200 text-gray-600 rounded-xl text-sm font-bold"
+          onClick={clearAll}
+        >
+          초기화
+        </button>
+        <button
+          className="w-4/6 h-12 bg-blue-500 text-white rounded-xl text-sm font-bold"
+          onClick={makeTrip}
+        >
+          일정 만들기
+        </button>
       </div>
     </Layout>
   );

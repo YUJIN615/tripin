@@ -108,3 +108,57 @@
 .range-custom {
   cursor: pointer;
 }
+
+/* DayPicker 커스텀 */
+.rdp-root {
+  @apply bg-white rounded-xl shadow-lg p-4 border border-gray-200;
+}
+
+.rdp-month_caption {
+  @apply text-base font-bold text-gray-800 mb-4;
+}
+
+.rdp-weekday {
+  @apply text-sm font-medium text-gray-600;
+}
+
+.rdp-day {
+  @apply text-sm text-gray-700 hover:bg-blue-50 rounded-lg transition-colors;
+}
+
+.rdp-day_button {
+  @apply w-10 h-10 rounded-lg;
+}
+
+.rdp-selected {
+  @apply bg-blue-500 text-white hover:bg-blue-600;
+}
+
+.rdp-range_start,
+.rdp-range_end {
+  @apply bg-blue-500 text-white;
+}
+
+.rdp-range_middle {
+  @apply bg-blue-100 text-blue-900;
+}
+
+.rdp-today {
+  @apply font-bold text-blue-600;
+}
+
+.rdp-disabled {
+  @apply text-gray-300 cursor-not-allowed hover:bg-transparent;
+}
+
+.rdp-outside {
+  @apply text-gray-400;
+}
+
+.rdp-nav {
+  @apply gap-2;
+}
+
+.rdp-nav_button {
+  @apply hover:bg-gray-100 rounded-lg p-2 transition-colors;
+}

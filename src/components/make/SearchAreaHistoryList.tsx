@@ -7,9 +7,13 @@ type SearchHistoryListProps = {
 
 export const SearchHistoryList = ({ SearchHistoryItems = [] }: SearchHistoryListProps) => {
   return (
-    <div>
-      <h2 className="text-base font-bold py-3 px-1">최근 검색</h2>
-      <SearchList type="history" SearchItems={SearchHistoryItems} />
-    </div>
+    <>
+      {SearchHistoryItems.length > 0 && (
+        <div>
+          <h2 className="text-base font-bold py-3 px-1">최근 검색</h2>
+          <SearchList type="history" SearchItems={SearchHistoryItems} />
+        </div>
+      )}
+    </>
   );
 };

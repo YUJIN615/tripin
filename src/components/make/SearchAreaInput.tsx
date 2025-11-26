@@ -14,7 +14,7 @@ export const SearchInput = ({
           <MagnifyingGlassIcon className="w-5 h-5" />
           <input
             type="text"
-            placeholder="장소를 검색해주세요."
+            placeholder="지역을 검색해주세요."
             className="w-full border-none outline-none text-base text-gray-600 placeholder:text-sm placeholder:text-gray-500"
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}

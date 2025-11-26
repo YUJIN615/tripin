@@ -1,3 +1,4 @@
+import { useRouter } from "next/navigation";
 import { XMarkIcon } from "@heroicons/react/24/solid";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { SearchItemType, SearchListType } from "@/types/make";
@@ -9,18 +10,21 @@ type SearchItemProps = {
 };
 
 export const SearchItem = ({ item, type }: SearchItemProps) => {
-  const { addSearchHistory, removeSearchHistory } = useMakeStore();
+  const router = useRouter();
+  const addSearchHistory = useMakeStore((state) => state.addSearchHistory);
+  const removeSearchHistory = useMakeStore((state) => state.removeSearchHistory);
+  const setPlace = useMakeStore((state) => state.setPlace);
 
   const handleClick = () => {
     if (type === "search") {
-      // 검색 결과 클릭 시 최근 검색에 추가
       addSearchHistory(item);
     }
-    // 여기에 추가 동작 (예: 페이지 이동) 구현 가능
+    setPlace(item.name);
+    router.push("/make");
   };
 
   const handleRemove = (e: React.MouseEvent) => {
-    e.stopPropagation(); // 부모 클릭 이벤트 방지
+    e.stopPropagation();
     removeSearchHistory(item.id);
   };
 
