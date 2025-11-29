@@ -1,8 +1,8 @@
-import axios from "axios";
 import { create } from "zustand";
 import { DateRange } from "react-day-picker";
 import { SearchItemType } from "@/types/make";
 import { PERSON_COUNT } from "@/constants/tripOptions";
+import { apiClient, API_ENDPOINTS } from "@/lib/api";
 
 const SEARCH_HISTORY_KEY = "tripin_search_history";
 const MAX_HISTORY_SIZE = 10;
@@ -12,7 +12,8 @@ interface MakeStore {
   region: string;
   date: DateRange | undefined;
   personCount: number;
-  selectedTripTypes: string[];
+  selectedTripPlaces: string[];
+  selectedTripThemes: string[];
   selectedTransports: string[];
   searchValue: string;
   searchItems: SearchItemType[];
@@ -20,7 +21,8 @@ interface MakeStore {
   setRegion: (value: string) => void;
   setDate: (value: DateRange | undefined) => void;
   setPersonCount: (value: number) => void;
-  setSelectedTripTypes: (value: string[]) => void;
+  setSelectedTripPlaces: (value: string[]) => void;
+  setSelectedTripThemes: (value: string[]) => void;
   setSelectedTransports: (value: string[]) => void;
   setSearchValue: (value: string) => void;
   getSuggestValue: (value: string) => Promise<SearchItemType[]>;
@@ -35,7 +37,8 @@ export const useMakeStore = create<MakeStore>((set, get) => ({
   region: "",
   date: undefined,
   personCount: DEFAULT_PERSON_COUNT,
-  selectedTripTypes: [],
+  selectedTripPlaces: [],
+  selectedTripThemes: [],
   selectedTransports: [],
   searchValue: "",
   searchItems: [],
@@ -53,8 +56,12 @@ export const useMakeStore = create<MakeStore>((set, get) => ({
     set({ personCount: value });
   },
 
-  setSelectedTripTypes: (value: string[]) => {
-    set({ selectedTripTypes: value });
+  setSelectedTripPlaces: (value: string[]) => {
+    set({ selectedTripPlaces: value });
+  },
+
+  setSelectedTripThemes: (value: string[]) => {
+    set({ selectedTripThemes: value });
   },
 
   setSelectedTransports: (value: string[]) => {
@@ -63,7 +70,7 @@ export const useMakeStore = create<MakeStore>((set, get) => ({
 
   // 입력한 지역 검색 결과 반환
   getSuggestValue: async (value: string): Promise<SearchItemType[]> => {
-    const response = await axios.get("/api/regions", {
+    const response = await apiClient.get(API_ENDPOINTS.regions, {
       params: { keyword: value },
     });
     return response.data as SearchItemType[];
@@ -136,7 +143,7 @@ export const useMakeStore = create<MakeStore>((set, get) => ({
       region: "",
       date: undefined,
       personCount: DEFAULT_PERSON_COUNT,
-      selectedTripTypes: [],
+      selectedTripPlaces: [],
       selectedTransports: [],
       searchValue: "",
       searchItems: [],
@@ -145,13 +152,13 @@ export const useMakeStore = create<MakeStore>((set, get) => ({
 
   // 일정 만들기
   makeTrip: async () => {
-    const { region, date, personCount, selectedTripTypes, selectedTransports } = get();
-    const response = await axios.post("/api/trips", {
+    const { region, date, personCount, selectedTripPlaces, selectedTransports } = get();
+    const response = await apiClient.post(API_ENDPOINTS.trips, {
       region,
       date,
       personCount,
-      selectedTripTypes,
-      selectedTransports,
+      tripTypes: selectedTripPlaces,
+      transports: selectedTransports,
     });
     return response.data;
   },

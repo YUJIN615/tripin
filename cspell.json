@@ -1,0 +1,40 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "words": [
+    "Kakao",
+    "KakaoAK",
+    "dapi",
+    "Naver",
+    "tripin",
+    "zustand",
+    "lucide",
+    "swiper",
+    "daypicker",
+    "msw",
+    "axios",
+    "tailwindcss",
+    "postcss",
+    "makeStore",
+    "useMakeStore",
+    "tripTypes",
+    "transports",
+    "personCount",
+    "roadAddress",
+    "mapx",
+    "mapy",
+    "noto",
+    "sans",
+    "ollama"
+  ],
+  "ignorePaths": [
+    "node_modules",
+    ".next",
+    "build",
+    "dist",
+    "*.json",
+    "package-lock.json",
+    "pnpm-lock.yaml",
+    ".git"
+  ]
+}

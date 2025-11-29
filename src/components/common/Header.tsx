@@ -15,13 +15,13 @@ export const Header = ({ title, showBackButton = true }: HeaderProps) => {
   };
 
   return (
-    <header className="flex justify-between items-center px-[16px] py-[12px]">
+    <header className="flex items-center px-[16px] py-[12px]">
       {showBackButton && (
         <div onClick={handleBack}>
           <ChevronLeftIcon className="w-5 h-5" />
         </div>
       )}
-      <h1 className="w-full text-l font-bold text-center">{title}</h1>
+      <h1 className="w-full text-l font-bold text-center mr-5">{title}</h1>
     </header>
   );
 };

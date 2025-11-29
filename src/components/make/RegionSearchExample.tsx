@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import axios from "axios";
+import { apiClient, API_ENDPOINTS } from "@/lib/api";
 
 interface Region {
   id: number;
@@ -16,7 +16,7 @@ export const RegionSearchExample = () => {
   const searchRegions = async (searchKeyword: string) => {
     setLoading(true);
     try {
-      const response = await axios.get("/api/regions", {
+      const response = await apiClient.get(API_ENDPOINTS.regions, {
         params: { keyword: searchKeyword },
       });
       setRegions(response.data);
@@ -53,10 +53,7 @@ export const RegionSearchExample = () => {
         ))}
       </ul>
 
-      {!loading && regions.length === 0 && (
-        <p className="text-gray-500">검색 결과가 없습니다.</p>
-      )}
+      {!loading && regions.length === 0 && <p className="text-gray-500">검색 결과가 없습니다.</p>}
     </div>
   );
 };
-

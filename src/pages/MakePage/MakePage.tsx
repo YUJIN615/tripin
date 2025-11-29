@@ -6,7 +6,7 @@ import { ko } from "react-day-picker/locale";
 import { useMakeStore } from "@/stores/makeStore";
 import { Layout } from "@/components/common/Layout";
 import { hasValue } from "@/utils/common";
-import { TRIP_TYPES, PERSON_COUNT, TRANSPORT_TYPES } from "@/constants";
+import { TRIP_PLACES, TRIP_THEMES, PERSON_COUNT, TRANSPORT_TYPES } from "@/constants";
 import "react-day-picker/style.css";
 
 export const MakePage = () => {
@@ -17,12 +17,14 @@ export const MakePage = () => {
   const region = useMakeStore((state) => state.region);
   const date = useMakeStore((state) => state.date);
   const personCount = useMakeStore((state) => state.personCount);
-  const selectedTripTypes = useMakeStore((state) => state.selectedTripTypes);
+  const selectedTripPlaces = useMakeStore((state) => state.selectedTripPlaces);
+  const selectedTripThemes = useMakeStore((state) => state.selectedTripThemes);
   const selectedTransports = useMakeStore((state) => state.selectedTransports);
 
   const setDate = useMakeStore((state) => state.setDate);
   const setPersonCount = useMakeStore((state) => state.setPersonCount);
-  const setSelectedTripTypes = useMakeStore((state) => state.setSelectedTripTypes);
+  const setSelectedTripPlaces = useMakeStore((state) => state.setSelectedTripPlaces);
+  const setSelectedTripThemes = useMakeStore((state) => state.setSelectedTripThemes);
   const setSelectedTransports = useMakeStore((state) => state.setSelectedTransports);
 
   const clearAll = useMakeStore((state) => state.clearAll);
@@ -30,11 +32,20 @@ export const MakePage = () => {
 
   // 여행 타입 토글 함수
   const toggleTripType = (value: string) => {
-    setSelectedTripTypes(
-      selectedTripTypes.includes(value)
-        ? selectedTripTypes.filter((v) => v !== value)
-        : [...selectedTripTypes, value]
+    setSelectedTripPlaces(
+      selectedTripPlaces.includes(value)
+        ? selectedTripPlaces.filter((v) => v !== value)
+        : [...selectedTripPlaces, value]
     );
+  };
+
+  // 여행 테마 토글 함수
+  const toggleTripThemes = (value: string) => {
+    setSelectedTripThemes(
+      selectedTripThemes.includes(value)
+        ? selectedTripThemes.filter((v) => v !== value)
+        : [...selectedTripThemes, value]
+      );
   };
 
   // 이동 수단 토글 함수
@@ -66,12 +77,6 @@ export const MakePage = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isOpenCalendar]);
-
-  useEffect(() => {
-    return () => {
-      clearAll();
-    };
-  }, [clearAll]);
 
   return (
     <Layout title="새 일정">
@@ -132,17 +137,40 @@ export const MakePage = () => {
         </div>
       </div>
       <div className="mb-8">
-        <h3 className="text-base font-bold mb-3">여행 컨셉</h3>
+        <h3 className="text-base font-bold mb-3">여행 장소</h3>
         <div className="flex items-center gap-2 flex-wrap">
-          {TRIP_TYPES.map((type) => (
+          {TRIP_PLACES.map((type) => (
             <div key={type.id}>
               <input
                 type="checkbox"
                 id={type.value}
                 name="type"
                 className="peer hidden"
-                checked={selectedTripTypes.includes(type.value)}
+                checked={selectedTripPlaces.includes(type.value)}
                 onChange={() => toggleTripType(type.value)}
+              />
+              <label
+                htmlFor={type.value}
+                className="inline-block px-3 py-1.5 text-sm rounded-3xl border border-gray-300 text-gray-600 cursor-pointer transition-all hover:border-blue-400 peer-checked:bg-blue-500 peer-checked:text-white peer-checked:border-blue-500"
+              >
+                {type.name}
+              </label>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="mb-8">
+        <h3 className="text-base font-bold mb-3">여행 테마</h3>
+        <div className="flex items-center gap-2 flex-wrap">
+          {TRIP_THEMES.map((type) => (
+            <div key={type.id}>
+              <input
+                type="checkbox"
+                id={type.value}
+                name="theme"
+                className="peer hidden"
+                checked={selectedTripThemes.includes(type.value)}
+                onChange={() => toggleTripThemes(type.value)}
               />
               <label
                 htmlFor={type.value}

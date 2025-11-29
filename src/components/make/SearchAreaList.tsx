@@ -13,13 +13,11 @@ export const SearchItem = ({ item, type }: SearchItemProps) => {
   const router = useRouter();
   const addSearchHistory = useMakeStore((state) => state.addSearchHistory);
   const removeSearchHistory = useMakeStore((state) => state.removeSearchHistory);
-  const setPlace = useMakeStore((state) => state.setPlace);
+  const setRegion = useMakeStore((state) => state.setRegion);
 
   const handleClick = () => {
-    if (type === "search") {
-      addSearchHistory(item);
-    }
-    setPlace(item.name);
+    addSearchHistory(item);
+    setRegion(item.name);
     router.push("/make");
   };
 

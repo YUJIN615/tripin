@@ -18,5 +18,19 @@
   },
   "[json]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
+  },
+  "cSpell.words": [
+    "Kakao",
+    "dapi",
+    "tripin",
+    "makeStore",
+    "zustand",
+    "lucide",
+    "swiper",
+    "daypicker",
+    "roadAddress",
+    "mapx",
+    "mapy",
+    "msw"
+  ]
 }

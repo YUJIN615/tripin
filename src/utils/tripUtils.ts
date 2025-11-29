@@ -1,4 +1,4 @@
-import { TRIP_TYPES, TRANSPORT_TYPES } from "@/constants";
+import { TRIP_PLACES, TRANSPORT_TYPES } from "@/constants";
 
 /**
  * 여행 타입 value 배열을 name 문자열로 변환
@@ -7,7 +7,7 @@ import { TRIP_TYPES, TRANSPORT_TYPES } from "@/constants";
  */
 export const getTripTypeNames = (values: string[]): string => {
   return values
-    .map((value) => TRIP_TYPES.find((type) => type.value === value)?.name)
+    .map((value) => TRIP_PLACES.find((type) => type.value === value)?.name)
     .filter(Boolean)
     .join(", ");
 };
@@ -30,7 +30,7 @@ export const getTransportTypeNames = (values: string[]): string => {
  * @returns 이름 (예: "맛집") 또는 undefined
  */
 export const getTripTypeName = (value: string): string | undefined => {
-  return TRIP_TYPES.find((type) => type.value === value)?.name;
+  return TRIP_PLACES.find((type) => type.value === value)?.name;
 };
 
 /**

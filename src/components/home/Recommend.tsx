@@ -21,12 +21,12 @@ export const Recommend = () => {
     {
       id: 3,
       title: "추천 3",
-      image: "https://picsum.photos/300/150?random=3",
+      image: "https://picsum.photos/300/150?random=13",
     },
     {
       id: 4,
       title: "추천 4",
-      image: "https://picsum.photos/300/150?random=4",
+      image: "https://picsum.photos/300/150?random=15",
     },
     {
       id: 5,
@@ -37,7 +37,7 @@ export const Recommend = () => {
       id: 6,
       title: "추천 6",
       image: "https://picsum.photos/300/150?random=6",
-    },  
+    },
   ];
   return (
     <div className="recommend-container pb-3">
