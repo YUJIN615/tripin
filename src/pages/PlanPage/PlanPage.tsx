@@ -42,7 +42,7 @@ export const PlanPage = () => {
   ];
 
   return (
-    <Layout title="내 일정">
+    <Layout title="내 여행">
       <ul className="flex flex-col">
         {result.map((item) => (
           <li key={item.id} className="flex flex-col gap-1 text-sm border-b border-gray-200 py-4">

@@ -21,19 +21,19 @@ export interface ActivityType {
   id: string;
 }
 
-export interface DayItineraryType {
+export interface PlanDayItineraryType {
   date: string;
   activities: ActivityType[];
 }
 
-export interface TripItineraryType {
+export interface PlanItineraryType {
   start_date: string;
   end_date: string;
   people: number;
   type: string;
   transport: string;
   region: string;
-  itinerary: DayItineraryType[];
+  itinerary: PlanDayItineraryType[];
 }
 
 export interface TripResultType {
@@ -45,6 +45,6 @@ export interface TripResultType {
     tripTypes: string[];
     transports: string[];
     places: ActivityType[];
-    itinerary: TripItineraryType;
+    itinerary: PlanItineraryType;
   };
 }

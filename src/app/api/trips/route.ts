@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { getTripTypeNames } from "@/utils/tripUtils";
 import OpenAI from "openai";
 import prisma from "@/lib/prisma";
-
 interface KakaoPlaceItem {
   id?: string;
   place_name: string;
@@ -52,16 +51,27 @@ export async function POST(request: NextRequest) {
 
       if (cachedPlaces.length >= 10) {
         console.log(`💾 [Cache Hit] ${region} ${tripType}: DB에서 ${cachedPlaces.length}개 로드`);
-        return cachedPlaces.map((p) => ({
-          id: p.kakaoPlaceId,
-          place_name: p.placeName,
-          category_name: p.categoryName ?? "",
-          address_name: p.addressName ?? "",
-          road_address_name: p.roadAddressName ?? "",
-          x: p.x,
-          y: p.y,
-          phone: p.phone ?? "",
-        }));
+        return cachedPlaces.map(
+          (p: {
+            kakaoPlaceId: string;
+            placeName: string;
+            categoryName: string | null;
+            addressName: string | null;
+            roadAddressName: string | null;
+            x: string;
+            y: string;
+            phone: string | null;
+          }) => ({
+            id: p.kakaoPlaceId,
+            place_name: p.placeName,
+            category_name: p.categoryName ?? "",
+            address_name: p.addressName ?? "",
+            road_address_name: p.roadAddressName ?? "",
+            x: p.x,
+            y: p.y,
+            phone: p.phone ?? "",
+          })
+        );
       }
 
       // 2. 캐시 미스 - Kakao API 호출
@@ -266,12 +276,86 @@ export async function POST(request: NextRequest) {
       temperature: 0,
     });
 
-    const event = response.output_parsed;
-    console.log(JSON.stringify(event, null, 2));
+    interface PlanDayItinerary {
+      date: string;
+      activities: Array<{
+        time: string;
+        activity: string;
+        place_name: string;
+        road_address_name: string;
+        x: string;
+        y: string;
+        category_name: string;
+        category_group_code: string;
+        category_group_name: string;
+        phone?: string;
+        id?: string;
+      }>;
+    }
+
+    interface PlanItinerary {
+      start_date: string;
+      end_date: string;
+      people: number;
+      type: string;
+      transport: string;
+      region: string;
+      itinerary: PlanDayItinerary[];
+    }
+
+    const event = response.output_parsed as PlanItinerary | null;
+
+    if (!event) {
+      throw new Error("AI 응답 파싱 실패");
+    }
+
+    console.log("✅ [API Route] AI 여행 일정 생성 완료");
+    console.log("📅 [API Route] 생성된 일정:", JSON.stringify(event, null, 2));
+
+    // 데이터베이스에 여행 일정 저장
+    let savedPlanId: string | null = null;
+    try {
+      const plan = await prisma.plan.create({
+        data: {
+          region: event.region || region,
+          startDate: event.start_date,
+          endDate: event.end_date,
+          personCount: event.people || personCount,
+          tripTypes: JSON.stringify(tripTypes),
+          transports: JSON.stringify(transports),
+          days: {
+            create: event.itinerary.map((day) => ({
+              date: day.date,
+              activities: {
+                create: day.activities.map((activity) => ({
+                  time: activity.time,
+                  activity: activity.activity,
+                  placeName: activity.place_name,
+                  roadAddressName: activity.road_address_name,
+                  x: activity.x,
+                  y: activity.y,
+                  categoryName: activity.category_name,
+                  categoryGroupCode: activity.category_group_code,
+                  categoryGroupName: activity.category_group_name,
+                  phone: activity.phone || null,
+                  kakaoPlaceId: activity.id || "",
+                })),
+              },
+            })),
+          },
+        },
+      });
+      savedPlanId = plan.id;
+      console.log("💾 [API Route] 여행 일정 DB 저장 완료:", savedPlanId);
+    } catch (dbError) {
+      console.error("⚠️ [API Route] DB 저장 실패 (응답은 정상 반환):", dbError);
+      // DB 저장 실패해도 응답은 정상 반환
+    }
 
     return NextResponse.json({
       success: true,
       data: {
+        id: savedPlanId, // 저장된 일정 ID 포함
         region,
         date,
         personCount,
@@ -282,7 +366,7 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("❌ [API Route] Trip creation error:", error);
-    return NextResponse.json({ success: false, error: "Failed to create trip" }, { status: 500 });
+    console.error("❌ [API Route] Plan creation error:", error);
+    return NextResponse.json({ success: false, error: "Failed to create plan" }, { status: 500 });
   }
 }

@@ -14,7 +14,7 @@ interface MakeTripParams {
 }
 
 // localStorage에 결과 저장
-const saveTripResultToLocalStorage = (result: TripResultType) => {
+const savePlanResultToLocalStorage = (result: TripResultType) => {
   if (typeof window !== "undefined") {
     try {
       localStorage.setItem(TRIP_RESULT_KEY, JSON.stringify(result));
@@ -63,7 +63,7 @@ export const useMakeTrip = () => {
     },
     onSuccess: (data) => {
       // 성공 시 localStorage에 저장
-      saveTripResultToLocalStorage(data);
+      savePlanResultToLocalStorage(data);
       console.log("✅ 일정 만들기 성공 및 localStorage 저장 완료");
     },
     onError: (error) => {

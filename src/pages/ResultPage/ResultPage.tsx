@@ -44,7 +44,7 @@ export const ResultPage = () => {
     );
   };
 
-  const saveTripResult = () => {
+  const savePlanResult = () => {
     console.log("저장하기");
   };
   // 컴포넌트 마운트 시 localStorage에서 데이터 불러오기
@@ -154,9 +154,9 @@ export const ResultPage = () => {
             <button
               className="w-4/6 h-12 bg-blue-500 text-white rounded-xl text-sm font-bold disabled:bg-gray-400 disabled:cursor-not-allowed"
               disabled={isPending}
-              onClick={saveTripResult}
+              onClick={savePlanResult}
             >
-              저장하기
+              내 여행에 추가
             </button>
           </div>
         </div>

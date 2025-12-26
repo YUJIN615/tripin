@@ -38,3 +38,50 @@ model Place {
 
   @@index([regionId, tripType])
 }
+
+// 여행 일정
+model Plan {
+  id          String      @id @default(uuid())
+  region      String
+  startDate   String      // ISO date string
+  endDate     String      // ISO date string
+  personCount Int
+  tripTypes   String      // JSON array string
+  transports  String      // JSON array string
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  days        PlanDay[]
+
+  @@index([createdAt])
+}
+
+// 여행 일정의 각 날짜
+model PlanDay {
+  id        Int            @id @default(autoincrement())
+  planId    String
+  plan      Plan           @relation(fields: [planId], references: [id], onDelete: Cascade)
+  date      String         // ISO date string
+  activities PlanActivity[]
+
+  @@index([planId])
+}
+
+// 여행 일정의 각 활동
+model PlanActivity {
+  id                Int     @id @default(autoincrement())
+  planDayId         Int
+  planDay           PlanDay @relation(fields: [planDayId], references: [id], onDelete: Cascade)
+  time              String
+  activity          String
+  placeName         String
+  roadAddressName   String
+  x                 String
+  y                 String
+  categoryName      String
+  categoryGroupCode String
+  categoryGroupName String
+  phone             String?
+  kakaoPlaceId      String
+
+  @@index([planDayId])
+}

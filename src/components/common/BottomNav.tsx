@@ -39,7 +39,7 @@ export const BottomNav = () => {
         ) : (
           <CalendarIconOutline className={iconClassName} />
         ),
-      text: "내 일정",
+      text: "내 여행",
     },
     {
       path: "/",
