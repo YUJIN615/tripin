@@ -1,0 +1,40 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// 지역
+model Region {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  places    Place[]
+}
+
+// 장소 캐시 (Kakao API 결과 저장)
+model Place {
+  id              Int      @id @default(autoincrement())
+  regionId        Int
+  region          Region   @relation(fields: [regionId], references: [id])
+  kakaoPlaceId    String   @unique
+  placeName       String
+  categoryName    String?
+  addressName     String?
+  roadAddressName String?
+  x               String
+  y               String
+  phone           String?
+  tripType        String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([regionId, tripType])
+}
