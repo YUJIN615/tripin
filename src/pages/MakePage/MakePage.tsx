@@ -131,147 +131,157 @@ export const MakePage = () => {
 
   return (
     <Layout title="새 일정">
-      <div className="mb-8">
-        <h3 className="text-base font-bold mb-3">지역</h3>
-        <Link
-          href="/search"
-          className="flex items-center gap-2 border border-gray-300 rounded-xl px-3 p-3 bg-white"
-        >
-          <div className={`text-sm ${hasValue(region) ? "text-gray-700" : "text-gray-400"}`}>
-            {hasValue(region) ? region : "지역을 입력해주세요."}
-          </div>
-        </Link>
-      </div>
-      <div className="mb-8">
-        <h3 className="text-base font-bold mb-3">날짜</h3>
-        <div
-          ref={calendarContainerRef}
-          className="flex items-center gap-2 h-12 cursor-pointer border border-gray-300 rounded-xl px-3 text-sm text-gray-700 placeholder:text-gray-400"
-          onClick={toggleCalendar}
-        >
-          {date ? (
-            <div className="flex items-center gap-2">
-              <div className="text-gray-700">{date?.from?.toLocaleDateString()}</div>
-              <div>~</div>
-              <div className="text-gray-700">{date?.to?.toLocaleDateString()}</div>
-            </div>
-          ) : (
-            <div className="text-gray-400">날짜를 선택해주세요.</div>
-          )}
+      {isPending ? (
+        <div className="flex items-center justify-center h-64">
+          <p className="text-gray-500">일정을 불러오는 중...</p>
         </div>
-        {isOpenCalendar && (
-          <div ref={calendarRef} className="mt-2">
-            <DayPicker
-              mode="range"
-              selected={date}
-              onSelect={(value) => selectDate(value)}
-              locale={ko}
-            />
-          </div>
-        )}
-      </div>
-      <div className="mb-8">
-        <h3 className="text-base font-bold mb-3">인원</h3>
-        <div className="mb-2 text-base font-bold text-gray-700">
-          {personCount}명 {personCount === PERSON_COUNT.MAX && "이상"}
-        </div>
-        <input
-          type="range"
-          min={PERSON_COUNT.MIN}
-          max={PERSON_COUNT.MAX}
-          value={personCount}
-          onChange={(e) => setPersonCount(parseInt(e.target.value))}
-          className="w-full h-2 range-custom"
-        />
-        <div className="flex items-center justify-between mt-1 text-[12px] text-gray-600">
-          <div>{PERSON_COUNT.MIN}</div>
-          <div>{PERSON_COUNT.MAX}명 이상</div>
-        </div>
-      </div>
-      <div className="mb-8">
-        <h3 className="text-base font-bold mb-3">여행 장소</h3>
-        <div className="flex items-center gap-2 flex-wrap">
-          {TRIP_PLACES.map((type) => (
-            <div key={type.id}>
-              <input
-                type="checkbox"
-                id={type.value}
-                name="type"
-                className="peer hidden"
-                checked={selectedTripPlaces.includes(type.value)}
-                onChange={() => toggleTripType(type.value)}
-              />
-              <label
-                htmlFor={type.value}
-                className="inline-block px-3 py-1.5 text-sm rounded-3xl border border-gray-300 text-gray-600 cursor-pointer transition-all hover:border-blue-400 peer-checked:bg-blue-500 peer-checked:text-white peer-checked:border-blue-500"
+      ) : (
+        <>
+          <>
+            <div className="mb-8">
+              <h3 className="text-base font-bold mb-3">지역</h3>
+              <Link
+                href="/search"
+                className="flex items-center gap-2 border border-gray-300 rounded-xl px-3 p-3 bg-white"
               >
-                {type.name}
-              </label>
+                <div className={`text-sm ${hasValue(region) ? "text-gray-700" : "text-gray-400"}`}>
+                  {hasValue(region) ? region : "지역을 입력해주세요."}
+                </div>
+              </Link>
             </div>
-          ))}
-        </div>
-      </div>
-      <div className="mb-8">
-        <h3 className="text-base font-bold mb-3">여행 컨셉</h3>
-        <div className="flex items-center gap-2 flex-wrap">
-          {TRIP_CONCEPTS.map((type) => (
-            <div key={type.id}>
-              <input
-                type="checkbox"
-                id={type.value}
-                name="concept"
-                className="peer hidden"
-                checked={selectedTripConcepts.includes(type.value)}
-                onChange={() => toggleTripConcept(type.value)}
-              />
-              <label
-                htmlFor={type.value}
-                className="inline-block px-3 py-1.5 text-sm rounded-3xl border border-gray-300 text-gray-600 cursor-pointer transition-all hover:border-blue-400 peer-checked:bg-blue-500 peer-checked:text-white peer-checked:border-blue-500"
+            <div className="mb-8">
+              <h3 className="text-base font-bold mb-3">날짜</h3>
+              <div
+                ref={calendarContainerRef}
+                className="flex items-center gap-2 h-12 cursor-pointer border border-gray-300 rounded-xl px-3 text-sm text-gray-700 placeholder:text-gray-400"
+                onClick={toggleCalendar}
               >
-                {type.name}
-              </label>
+                {date ? (
+                  <div className="flex items-center gap-2">
+                    <div className="text-gray-700">{date?.from?.toLocaleDateString()}</div>
+                    <div>~</div>
+                    <div className="text-gray-700">{date?.to?.toLocaleDateString()}</div>
+                  </div>
+                ) : (
+                  <div className="text-gray-400">날짜를 선택해주세요.</div>
+                )}
+              </div>
+              {isOpenCalendar && (
+                <div ref={calendarRef} className="mt-2">
+                  <DayPicker
+                    mode="range"
+                    selected={date}
+                    onSelect={(value) => selectDate(value)}
+                    locale={ko}
+                  />
+                </div>
+              )}
             </div>
-          ))}
-        </div>
-      </div>
-      <div className="mb-8">
-        <h3 className="text-base font-bold mb-3">이동 수단</h3>
-        <div className="flex items-center gap-2 flex-wrap">
-          {TRANSPORT_TYPES.map((type) => (
-            <div key={type.id}>
+            <div className="mb-8">
+              <h3 className="text-base font-bold mb-3">인원</h3>
+              <div className="mb-2 text-base font-bold text-gray-700">
+                {personCount}명 {personCount === PERSON_COUNT.MAX && "이상"}
+              </div>
               <input
-                type="checkbox"
-                id={type.value}
-                name="transport"
-                className="peer hidden"
-                checked={selectedTransports.includes(type.value)}
-                onChange={() => toggleTransport(type.value)}
+                type="range"
+                min={PERSON_COUNT.MIN}
+                max={PERSON_COUNT.MAX}
+                value={personCount}
+                onChange={(e) => setPersonCount(parseInt(e.target.value))}
+                className="w-full h-2 range-custom"
               />
-              <label
-                htmlFor={type.value}
-                className="inline-block px-3 py-1.5 text-sm rounded-3xl border border-gray-300 text-gray-600 cursor-pointer transition-all hover:border-blue-400 peer-checked:bg-blue-500 peer-checked:text-white peer-checked:border-blue-500"
-              >
-                {type.name}
-              </label>
+              <div className="flex items-center justify-between mt-1 text-[12px] text-gray-600">
+                <div>{PERSON_COUNT.MIN}</div>
+                <div>{PERSON_COUNT.MAX}명 이상</div>
+              </div>
             </div>
-          ))}
-        </div>
-      </div>
-      <div className="flex items-center justify-between gap-2 pt-4 pb-4">
-        <button
-          className="w-2/6 h-12 bg-gray-200 text-gray-600 rounded-xl text-sm font-bold"
-          onClick={clearAll}
-        >
-          초기화
-        </button>
-        <button
-          className="w-4/6 h-12 bg-blue-500 text-white rounded-xl text-sm font-bold disabled:bg-gray-400 disabled:cursor-not-allowed"
-          onClick={handleMakeTrip}
-          disabled={isPending}
-        >
-          {isPending ? "생성 중..." : "일정 만들기"}
-        </button>
-      </div>
+            <div className="mb-8">
+              <h3 className="text-base font-bold mb-3">여행 장소</h3>
+              <div className="flex items-center gap-2 flex-wrap">
+                {TRIP_PLACES.map((type) => (
+                  <div key={type.id}>
+                    <input
+                      type="checkbox"
+                      id={type.value}
+                      name="type"
+                      className="peer hidden"
+                      checked={selectedTripPlaces.includes(type.value)}
+                      onChange={() => toggleTripType(type.value)}
+                    />
+                    <label
+                      htmlFor={type.value}
+                      className="inline-block px-3 py-1.5 text-sm rounded-3xl border border-gray-300 text-gray-600 cursor-pointer transition-all hover:border-blue-400 peer-checked:bg-blue-500 peer-checked:text-white peer-checked:border-blue-500"
+                    >
+                      {type.name}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="mb-8">
+              <h3 className="text-base font-bold mb-3">여행 컨셉</h3>
+              <div className="flex items-center gap-2 flex-wrap">
+                {TRIP_CONCEPTS.map((type) => (
+                  <div key={type.id}>
+                    <input
+                      type="checkbox"
+                      id={type.value}
+                      name="concept"
+                      className="peer hidden"
+                      checked={selectedTripConcepts.includes(type.value)}
+                      onChange={() => toggleTripConcept(type.value)}
+                    />
+                    <label
+                      htmlFor={type.value}
+                      className="inline-block px-3 py-1.5 text-sm rounded-3xl border border-gray-300 text-gray-600 cursor-pointer transition-all hover:border-blue-400 peer-checked:bg-blue-500 peer-checked:text-white peer-checked:border-blue-500"
+                    >
+                      {type.name}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="mb-8">
+              <h3 className="text-base font-bold mb-3">이동 수단</h3>
+              <div className="flex items-center gap-2 flex-wrap">
+                {TRANSPORT_TYPES.map((type) => (
+                  <div key={type.id}>
+                    <input
+                      type="checkbox"
+                      id={type.value}
+                      name="transport"
+                      className="peer hidden"
+                      checked={selectedTransports.includes(type.value)}
+                      onChange={() => toggleTransport(type.value)}
+                    />
+                    <label
+                      htmlFor={type.value}
+                      className="inline-block px-3 py-1.5 text-sm rounded-3xl border border-gray-300 text-gray-600 cursor-pointer transition-all hover:border-blue-400 peer-checked:bg-blue-500 peer-checked:text-white peer-checked:border-blue-500"
+                    >
+                      {type.name}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="flex items-center justify-between gap-2 pt-4 pb-4">
+              <button
+                className="w-2/6 h-12 bg-gray-200 text-gray-600 rounded-xl text-sm font-bold"
+                onClick={clearAll}
+              >
+                초기화
+              </button>
+              <button
+                className="w-4/6 h-12 bg-blue-500 text-white rounded-xl text-sm font-bold disabled:bg-gray-400 disabled:cursor-not-allowed"
+                onClick={handleMakeTrip}
+                disabled={isPending}
+              >
+                {isPending ? "생성 중..." : "일정 만들기"}
+              </button>
+            </div>
+          </>
+        </>
+      )}
     </Layout>
   );
 };
