@@ -1,11 +1,31 @@
-import { REGIONS } from "@/mocks/data/regions";
+import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const keyword = searchParams.get("keyword") ?? "";
 
-  const filtered = keyword ? REGIONS.filter((region) => region.name.includes(keyword)) : REGIONS;
+  try {
+    const regions = await prisma.region.findMany({
+      where: keyword
+        ? {
+            name: {
+              contains: keyword,
+            },
+          }
+        : undefined,
+      orderBy: {
+        id: "asc",
+      },
+      select: {
+        id: true,
+        name: true,
+      },
+    });
 
-  return NextResponse.json(filtered);
+    return NextResponse.json(regions);
+  } catch (error) {
+    console.error("Database error:", error);
+    return NextResponse.json({ error: "Failed to fetch regions" }, { status: 500 });
+  }
 }

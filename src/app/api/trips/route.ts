@@ -1,14 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getTripTypeNames } from "@/utils/tripUtils";
 import OpenAI from "openai";
+import prisma from "@/lib/prisma";
 
 interface KakaoPlaceItem {
+  id?: string;
   place_name: string;
   category_name: string;
   address_name: string;
   road_address_name: string;
   x: string;
   y: string;
+  phone?: string;
+}
+
+// Kakao API 응답 타입
+interface KakaoApiPlace extends KakaoPlaceItem {
+  id: string;
 }
 
 export async function POST(request: NextRequest) {
@@ -20,19 +28,84 @@ export async function POST(request: NextRequest) {
 
     const { region, date, personCount, tripTypes, transports } = body;
 
+    // 지역 ID 조회
+    const regionData = await prisma.region.findFirst({
+      where: { name: region },
+    });
+
+    if (!regionData) {
+      return NextResponse.json({ success: false, error: "Region not found" }, { status: 404 });
+    }
+
     const places: KakaoPlaceItem[] = [];
 
-    // 네이버 API 호출 함수 (단일 호출)
+    // DB에서 캐시된 장소 조회 또는 Kakao API 호출
+    const getPlacesForTripType = async (tripType: string): Promise<KakaoPlaceItem[]> => {
+      // 1. DB에서 캐시된 장소 조회
+      const cachedPlaces = await prisma.place.findMany({
+        where: {
+          regionId: regionData.id,
+          tripType: tripType,
+        },
+        take: 45,
+      });
+
+      if (cachedPlaces.length >= 10) {
+        console.log(`💾 [Cache Hit] ${region} ${tripType}: DB에서 ${cachedPlaces.length}개 로드`);
+        return cachedPlaces.map((p) => ({
+          id: p.kakaoPlaceId,
+          place_name: p.placeName,
+          category_name: p.categoryName ?? "",
+          address_name: p.addressName ?? "",
+          road_address_name: p.roadAddressName ?? "",
+          x: p.x,
+          y: p.y,
+          phone: p.phone ?? "",
+        }));
+      }
+
+      // 2. 캐시 미스 - Kakao API 호출
+      console.log(`🌐 [Cache Miss] ${region} ${tripType}: Kakao API 호출`);
+      const apiPlaces = await fetchKakaoPlaces(region, tripType);
+
+      // 3. DB에 저장 (중복 제외)
+      for (const place of apiPlaces) {
+        try {
+          await prisma.place.upsert({
+            where: { kakaoPlaceId: place.id },
+            update: {},
+            create: {
+              regionId: regionData.id,
+              kakaoPlaceId: place.id,
+              placeName: place.place_name,
+              categoryName: place.category_name,
+              addressName: place.address_name,
+              roadAddressName: place.road_address_name,
+              x: place.x,
+              y: place.y,
+              phone: place.phone ?? null,
+              tripType: tripType,
+            },
+          });
+        } catch {
+          // 중복 에러 무시
+        }
+      }
+      console.log(`💾 [Cached] ${region} ${tripType}: ${apiPlaces.length}개 저장됨`);
+
+      return apiPlaces;
+    };
+
+    // Kakao API 호출 함수
     const fetchKakaoPlacesOnce = async (
+      regionName: string,
       tripType: string,
       page: number,
       size: number
-    ): Promise<KakaoPlaceItem[]> => {
-      const query = `${region} ${getTripTypeNames([tripType])}`;
+    ): Promise<KakaoApiPlace[]> => {
+      const query = `${regionName} ${getTripTypeNames([tripType])}`;
       const encodedQuery = encodeURIComponent(query);
       const url = `https://dapi.kakao.com/v2/local/search/keyword.json?query=${encodedQuery}&page=${page}&size=${size}`;
-
-      console.log(`🔍 [API Route] Kakao API 호출 (${tripType}, page=${page}, size=${size})`);
 
       const response = await fetch(url, {
         headers: {
@@ -42,61 +115,45 @@ export async function POST(request: NextRequest) {
       });
 
       if (!response.ok) {
-        console.error(`❌ [API Route] Kakao API 오류: ${response.status}`);
         throw new Error(`Kakao API error: ${response.status}`);
       }
 
       const data = await response.json();
-      console.log(
-        `✅ [API Route] Kakao API 응답: ${data.documents?.length || 0}개 항목 (page=${page}, size=${size})`
-      );
-      return (data.documents || []) as KakaoPlaceItem[];
+      return (data.documents || []) as KakaoApiPlace[];
     };
 
     // Kakao API 여러 번 호출해서 45개 가져오기
-    const fetchKakaoPlaces = async (tripType: string): Promise<KakaoPlaceItem[]> => {
-      const allItems: KakaoPlaceItem[] = [];
+    const fetchKakaoPlaces = async (
+      regionName: string,
+      tripType: string
+    ): Promise<KakaoApiPlace[]> => {
+      const allItems: KakaoApiPlace[] = [];
       const size = 15;
       const totalItems = 45;
       const requestCount = Math.ceil(totalItems / size);
 
-      console.log(
-        `🔄 [API Route] ${tripType}: ${requestCount}번 호출로 최대 ${totalItems}개 가져오기 시작`
-      );
-
       for (let i = 0; i < requestCount; i++) {
         const page = i + 1;
         try {
-          const items = await fetchKakaoPlacesOnce(tripType, page, size);
+          const items = await fetchKakaoPlacesOnce(regionName, tripType, page, size);
           const uniqueItems = items.filter(
             (item) => !allItems.some((i) => i.place_name === item.place_name)
           );
           allItems.push(...uniqueItems);
 
-          // 더 이상 결과가 없으면 중단
-          if (items.length < size) {
-            console.log(
-              `⚠️ [API Route] ${tripType}: 더 이상 결과가 없음 (${allItems.length}개 수집)`
-            );
-            break;
-          }
+          if (items.length < size) break;
         } catch (error) {
-          console.error(
-            `❌ [API Route] ${tripType} 호출 실패 (page=${page}, size=${size}):`,
-            error
-          );
-          // 한 번 실패해도 계속 진행
+          console.error(`❌ [API Route] ${tripType} 호출 실패:`, error);
         }
       }
 
-      console.log(`✅ [API Route] ${tripType}: 총 ${allItems.length}개 수집 완료`);
       return allItems;
     };
 
-    // 모든 여행 타입에 대해 검색
+    // 모든 여행 타입에 대해 장소 조회 (캐시 우선)
     console.log(`🔄 [API Route] ${tripTypes.length}개 여행 타입에 대해 검색 시작`);
     for (const tripType of tripTypes) {
-      const items = await fetchKakaoPlaces(tripType);
+      const items = await getPlacesForTripType(tripType);
       places.push(...items);
     }
 
