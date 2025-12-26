@@ -1,8 +1,8 @@
 import { create } from "zustand";
 import { DateRange } from "react-day-picker";
-import { SearchItemType } from "@/types/make";
+import { SearchItemType, TripResultType } from "@/types/make";
 import { PERSON_COUNT } from "@/constants/tripOptions";
-import { apiClient, API_ENDPOINTS } from "@/lib/api";
+import { apiClient, API_ENDPOINTS } from "@/lib/api"; // getSuggestValue에서 사용
 
 const SEARCH_HISTORY_KEY = "tripin_search_history";
 const MAX_HISTORY_SIZE = 10;
@@ -13,16 +13,17 @@ interface MakeStore {
   date: DateRange | undefined;
   personCount: number;
   selectedTripPlaces: string[];
-  selectedTripThemes: string[];
+  selectedTripConcepts: string[];
   selectedTransports: string[];
   searchValue: string;
   searchItems: SearchItemType[];
   searchHistory: SearchItemType[];
+  tripResult: TripResultType | null; // 일정 만들기 API 응답 결과
   setRegion: (value: string) => void;
   setDate: (value: DateRange | undefined) => void;
   setPersonCount: (value: number) => void;
   setSelectedTripPlaces: (value: string[]) => void;
-  setSelectedTripThemes: (value: string[]) => void;
+  setSelectedTripConcepts: (value: string[]) => void;
   setSelectedTransports: (value: string[]) => void;
   setSearchValue: (value: string) => void;
   getSuggestValue: (value: string) => Promise<SearchItemType[]>;
@@ -30,7 +31,7 @@ interface MakeStore {
   removeSearchHistory: (id: number) => void;
   loadSearchHistory: () => void;
   clearAll: () => void;
-  makeTrip: () => void;
+  setTripResult: (result: TripResultType | null) => void;
 }
 
 export const useMakeStore = create<MakeStore>((set, get) => ({
@@ -38,11 +39,12 @@ export const useMakeStore = create<MakeStore>((set, get) => ({
   date: undefined,
   personCount: DEFAULT_PERSON_COUNT,
   selectedTripPlaces: [],
-  selectedTripThemes: [],
+  selectedTripConcepts: [],
   selectedTransports: [],
   searchValue: "",
   searchItems: [],
   searchHistory: [],
+  tripResult: null,
 
   setRegion: (value: string) => {
     set({ region: value });
@@ -60,8 +62,8 @@ export const useMakeStore = create<MakeStore>((set, get) => ({
     set({ selectedTripPlaces: value });
   },
 
-  setSelectedTripThemes: (value: string[]) => {
-    set({ selectedTripThemes: value });
+  setSelectedTripConcepts: (value: string[]) => {
+    set({ selectedTripConcepts: value });
   },
 
   setSelectedTransports: (value: string[]) => {
@@ -150,16 +152,8 @@ export const useMakeStore = create<MakeStore>((set, get) => ({
     });
   },
 
-  // 일정 만들기
-  makeTrip: async () => {
-    const { region, date, personCount, selectedTripPlaces, selectedTransports } = get();
-    const response = await apiClient.post(API_ENDPOINTS.trips, {
-      region,
-      date,
-      personCount,
-      tripTypes: selectedTripPlaces,
-      transports: selectedTransports,
-    });
-    return response.data;
+  // 일정 만들기 결과 저장
+  setTripResult: (result: TripResultType | null) => {
+    set({ tripResult: result });
   },
 }));

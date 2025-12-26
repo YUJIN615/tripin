@@ -107,7 +107,7 @@ export async function POST(request: NextRequest) {
     });
 
     const response = await openai.responses.parse({
-      model: "gpt-4o-mini",
+      model: "gpt-4o",
       input: [
         {
           role: "system",
@@ -128,6 +128,7 @@ export async function POST(request: NextRequest) {
             - activities 배열에 있는 item의 place_name, road_address_name, x, y, category_name, category_group_code, category_group_name, phone, id는 장소 정보에 있는 장소 중에서 가장 적합한 장소를 추천해야 합니다.
             - 장소 정보에 없는 곳은 추천하지 않습니다.
             - 장소 정보에 있는 데이터와 일치하도록 장소 정보를 추천합니다.
+            - 하루에 세 장소 이상 추천합니다.
 
             `,
         },
@@ -220,6 +221,7 @@ export async function POST(request: NextRequest) {
         tripTypes,
         transports,
         places,
+        itinerary: event,
       },
     });
   } catch (error) {

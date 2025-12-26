@@ -32,8 +32,8 @@ export const TRIP_PLACES = [
   },
 ] as const;
 
-// 여행 테마 옵션
-export const TRIP_THEMES = [
+// 여행 컨셉 옵션
+export const TRIP_CONCEPTS = [
   {
     id: 1,
     name: "감성적인",

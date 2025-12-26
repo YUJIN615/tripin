@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Noto_Sans_KR } from "next/font/google";
 import "./globals.css";
 import { MSWProvider } from "./MSWProvider";
+import { QueryProvider } from "@/providers/QueryProvider";
 
 // 한글 폰트
 const notoSansKr = Noto_Sans_KR({
@@ -14,7 +15,7 @@ const notoSansKr = Noto_Sans_KR({
 
 export const metadata: Metadata = {
   title: "TripIn",
-  description: "나만의 여행 일정 자동 생성 앱"
+  description: "나만의 여행 일정 자동 생성 앱",
 };
 
 export default function RootLayout({
@@ -25,7 +26,9 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body className={notoSansKr.className}>
-        <MSWProvider>{children}</MSWProvider>
+        <QueryProvider>
+          <MSWProvider>{children}</MSWProvider>
+        </QueryProvider>
       </body>
     </html>
   );

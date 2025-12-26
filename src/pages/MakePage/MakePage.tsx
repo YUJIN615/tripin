@@ -1,16 +1,21 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { DayPicker } from "react-day-picker";
+import { useRouter } from "next/navigation";
+import { DateRange, DayPicker } from "react-day-picker";
 import { ko } from "react-day-picker/locale";
 import { useMakeStore } from "@/stores/makeStore";
+import { useMakeTrip } from "@/hooks/useMakeTrip";
 import { Layout } from "@/components/common/Layout";
 import { hasValue } from "@/utils/common";
-import { TRIP_PLACES, TRIP_THEMES, PERSON_COUNT, TRANSPORT_TYPES } from "@/constants";
+import { TRIP_PLACES, TRIP_CONCEPTS, PERSON_COUNT, TRANSPORT_TYPES } from "@/constants";
 import "react-day-picker/style.css";
 
 export const MakePage = () => {
+  const router = useRouter();
   const calendarRef = useRef<HTMLDivElement>(null);
+  const calendarContainerRef = useRef<HTMLDivElement>(null);
+  const dateClickCountRef = useRef(0);
 
   const [isOpenCalendar, setIsOpenCalendar] = useState(false);
 
@@ -18,17 +23,32 @@ export const MakePage = () => {
   const date = useMakeStore((state) => state.date);
   const personCount = useMakeStore((state) => state.personCount);
   const selectedTripPlaces = useMakeStore((state) => state.selectedTripPlaces);
-  const selectedTripThemes = useMakeStore((state) => state.selectedTripThemes);
+  const selectedTripConcepts = useMakeStore((state) => state.selectedTripConcepts);
   const selectedTransports = useMakeStore((state) => state.selectedTransports);
-
   const setDate = useMakeStore((state) => state.setDate);
   const setPersonCount = useMakeStore((state) => state.setPersonCount);
   const setSelectedTripPlaces = useMakeStore((state) => state.setSelectedTripPlaces);
-  const setSelectedTripThemes = useMakeStore((state) => state.setSelectedTripThemes);
+  const setSelectedTripConcepts = useMakeStore((state) => state.setSelectedTripConcepts);
   const setSelectedTransports = useMakeStore((state) => state.setSelectedTransports);
 
   const clearAll = useMakeStore((state) => state.clearAll);
-  const makeTrip = useMakeStore((state) => state.makeTrip);
+  const setTripResult = useMakeStore((state) => state.setTripResult);
+
+  // Tanstack Query mutation
+  const { mutate: makeTrip, isPending } = useMakeTrip();
+
+  const selectDate = (value: DateRange | undefined) => {
+    setDate(value);
+
+    // 클릭 횟수 증가
+    dateClickCountRef.current += 1;
+
+    // 2번 클릭하면 캘린더 닫기
+    if (dateClickCountRef.current === 2) {
+      setIsOpenCalendar(false);
+      dateClickCountRef.current = 0; // 카운트 초기화
+    }
+  };
 
   // 여행 타입 토글 함수
   const toggleTripType = (value: string) => {
@@ -39,13 +59,13 @@ export const MakePage = () => {
     );
   };
 
-  // 여행 테마 토글 함수
-  const toggleTripThemes = (value: string) => {
-    setSelectedTripThemes(
-      selectedTripThemes.includes(value)
-        ? selectedTripThemes.filter((v) => v !== value)
-        : [...selectedTripThemes, value]
-      );
+  // 여행 컨셉 토글 함수
+  const toggleTripConcept = (value: string) => {
+    setSelectedTripConcepts(
+      selectedTripConcepts.includes(value)
+        ? selectedTripConcepts.filter((v) => v !== value)
+        : [...selectedTripConcepts, value]
+    );
   };
 
   // 이동 수단 토글 함수
@@ -61,11 +81,42 @@ export const MakePage = () => {
     setIsOpenCalendar((prev) => !prev);
   };
 
+  // 일정 만들기 버튼 클릭 핸들러
+  const handleMakeTrip = () => {
+    makeTrip(
+      {
+        region,
+        date,
+        personCount,
+        tripTypes: selectedTripPlaces,
+        transports: selectedTransports,
+      },
+      {
+        onSuccess: (data) => {
+          console.log("✅ 일정 생성 성공:", data);
+          // Zustand 스토어에도 저장 (선택사항)
+          setTripResult(data);
+          // Result 페이지로 이동
+          router.push("/result");
+        },
+        onError: (error) => {
+          console.error("❌ 일정 생성 실패:", error);
+          alert("일정 생성에 실패했습니다. 다시 시도해주세요.");
+        },
+      }
+    );
+  };
+
   // 외부 클릭 감지
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (calendarRef.current && !calendarRef.current.contains(event.target as Node)) {
+      if (
+        calendarRef.current &&
+        !calendarRef.current.contains(event.target as Node) &&
+        !calendarContainerRef.current?.contains(event.target as Node)
+      ) {
         setIsOpenCalendar(false);
+        dateClickCountRef.current = 0; // 클릭 카운트 초기화
       }
     };
 
@@ -91,9 +142,10 @@ export const MakePage = () => {
           </div>
         </Link>
       </div>
-      <div ref={calendarRef} className="mb-8">
+      <div className="mb-8">
         <h3 className="text-base font-bold mb-3">날짜</h3>
         <div
+          ref={calendarContainerRef}
           className="flex items-center gap-2 h-12 cursor-pointer border border-gray-300 rounded-xl px-3 text-sm text-gray-700 placeholder:text-gray-400"
           onClick={toggleCalendar}
         >
@@ -108,11 +160,11 @@ export const MakePage = () => {
           )}
         </div>
         {isOpenCalendar && (
-          <div ref={calendarRef} className="mt-4">
+          <div ref={calendarRef} className="mt-2">
             <DayPicker
               mode="range"
               selected={date}
-              onSelect={(value) => setDate(value)}
+              onSelect={(value) => selectDate(value)}
               locale={ko}
             />
           </div>
@@ -160,17 +212,17 @@ export const MakePage = () => {
         </div>
       </div>
       <div className="mb-8">
-        <h3 className="text-base font-bold mb-3">여행 테마</h3>
+        <h3 className="text-base font-bold mb-3">여행 컨셉</h3>
         <div className="flex items-center gap-2 flex-wrap">
-          {TRIP_THEMES.map((type) => (
+          {TRIP_CONCEPTS.map((type) => (
             <div key={type.id}>
               <input
                 type="checkbox"
                 id={type.value}
-                name="theme"
+                name="concept"
                 className="peer hidden"
-                checked={selectedTripThemes.includes(type.value)}
-                onChange={() => toggleTripThemes(type.value)}
+                checked={selectedTripConcepts.includes(type.value)}
+                onChange={() => toggleTripConcept(type.value)}
               />
               <label
                 htmlFor={type.value}
@@ -213,10 +265,11 @@ export const MakePage = () => {
           초기화
         </button>
         <button
-          className="w-4/6 h-12 bg-blue-500 text-white rounded-xl text-sm font-bold"
-          onClick={makeTrip}
+          className="w-4/6 h-12 bg-blue-500 text-white rounded-xl text-sm font-bold disabled:bg-gray-400 disabled:cursor-not-allowed"
+          onClick={handleMakeTrip}
+          disabled={isPending}
         >
-          일정 만들기
+          {isPending ? "생성 중..." : "일정 만들기"}
         </button>
       </div>
     </Layout>
