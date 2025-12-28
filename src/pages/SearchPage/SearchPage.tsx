@@ -1,7 +1,7 @@
 "use client";
 import { useEffect } from "react";
 import Link from "next/link";
-import { Layout } from "@/components/common/Layout";
+import { Layout } from "@/components/layout/Layout";
 import { SearchInput } from "@/components/make/SearchAreaInput";
 import { SearchList } from "@/components/make/SearchAreaList";
 import { SearchHistoryList } from "@/components/make/SearchAreaHistoryList";

@@ -3,7 +3,7 @@ import { SearchArea } from "@/components/home/SearchArea";
 import { Recommend } from "@/components/home/Recommend";
 import { RecentlyView } from "@/components/home/RecentlyView";
 import { Upcoming } from "@/components/home/Upcoming";
-import { BottomNav } from "@/components/common/BottomNav";
+import { BottomNav } from "@/components/layout/BottomNav";
 
 export const HomePage = () => {
   return (

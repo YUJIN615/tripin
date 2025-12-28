@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Layout } from "@/components/common/Layout";
+import { Layout } from "@/components/layout/Layout";
 import { getTripTypeNames } from "@/utils/tripUtils";
 import { getTransportTypeNames } from "@/utils/tripUtils";
 

@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Layout } from "@/components/common/Layout";
+import { Layout } from "@/components/layout/Layout";
 import { useMakeStore } from "@/stores/makePlanStore";
 import { loadTripResultFromLocalStorage, useMakeTrip } from "@/hooks/useMakeTrip";
 import { useMakeMyTrip } from "@/hooks/useMakeMyTrip";
@@ -15,7 +15,7 @@ export const ResultPage = () => {
 
   const [tripResult, setLocalTripResult] = useState<TripCreateResponseType | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  
+
   // API 응답에서 실제 데이터 추출
   const result = tripResult?.data;
   console.log(result);
@@ -183,14 +183,14 @@ export const ResultPage = () => {
         <div className="flex items-center justify-between gap-2 pt-4 pb-4">
           <button
             className="w-2/6 h-12 bg-gray-200 text-gray-600 rounded-xl text-sm font-bold"
-            disabled={isPendingMakeTrip}
+            disabled={isPendingMakeTrip || isPendingMakeMyTrip}
             onClick={handleRemakeTrip}
           >
             다시 만들기
           </button>
           <button
             className="w-4/6 h-12 bg-blue-500 text-white rounded-xl text-sm font-bold disabled:bg-gray-400 disabled:cursor-not-allowed"
-            disabled={isPendingMakeTrip}
+            disabled={isPendingMakeTrip || isPendingMakeMyTrip}
             onClick={saveMyTrip}
           >
             내 여행에 추가

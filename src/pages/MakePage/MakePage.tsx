@@ -6,7 +6,7 @@ import { DateRange, DayPicker } from "react-day-picker";
 import { ko } from "react-day-picker/locale";
 import { useMakeStore } from "@/stores/makePlanStore";
 import { useMakeTrip } from "@/hooks/useMakeTrip";
-import { Layout } from "@/components/common/Layout";
+import { Layout } from "@/components/layout/Layout";
 import { hasValue } from "@/utils/common";
 import { TRIP_PLACES, TRIP_CONCEPTS, PERSON_COUNT, TRANSPORT_TYPES } from "@/constants";
 import "react-day-picker/style.css";
@@ -276,7 +276,7 @@ export const MakePage = () => {
                 onClick={handleMakeTrip}
                 disabled={isPending}
               >
-                일정 만들기
+                {isPending ? "생성 중..." : "일정 만들기"}
               </button>
             </div>
           </>

@@ -1,7 +1,7 @@
-import { PlanDayResponseType } from "@/types/plan";
+import { TripDayResponseType } from "@/types/trip";
 import { ActivityCard } from "./ActivityCard";
 
-export const DayCard = ({ day }: { day: PlanDayResponseType }) => {
+export const DayCard = ({ day }: { day: TripDayResponseType }) => {
  const { date, activities } = day;
 
   return (

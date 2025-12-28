@@ -1,6 +1,6 @@
-import { PlanActivityResponseType } from "@/types/plan";
+import { TripActivityResponseType } from "@/types/trip";
 
-export const ActivityCard = ({ activity }: { activity: PlanActivityResponseType }) => {
+export const ActivityCard = ({ activity }: { activity: TripActivityResponseType }) => {
   const { id, time, activity: activityName, placeName, roadAddressName, phone } = activity;
   return (
     <div key={id} className="border-l-2 border-blue-500 pl-3">

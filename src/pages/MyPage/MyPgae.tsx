@@ -1,4 +1,4 @@
-import { Layout } from "@/components/common/Layout";
+import { Layout } from "@/components/layout/Layout";
 import Link from "next/link";
 
 export const MyPage = () => {
