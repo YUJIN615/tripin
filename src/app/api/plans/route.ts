@@ -98,8 +98,8 @@ export async function POST(request: NextRequest) {
               tripType: tripType,
             },
           });
-        } catch {
-          // 중복 에러 무시
+        } catch (error) {
+          console.error(`❌ [API Route] DB 저장 실패:`, error);
         }
       }
       console.log(`💾 [Cached] ${region} ${tripType}: ${apiPlaces.length}개 저장됨`);
@@ -120,7 +120,7 @@ export async function POST(request: NextRequest) {
 
       const response = await fetch(url, {
         headers: {
-          Authorization: `KakaoAK ${process.env.NEXT_PUBLIC_KAKAO_REST_API_KEY ?? ""}`,
+          Authorization: `KakaoAK ${process.env.KAKAO_REST_API_KEY ?? ""}`,
         },
         method: "GET",
       });
@@ -171,7 +171,7 @@ export async function POST(request: NextRequest) {
     console.log(`✅ [API Route] 총 ${places.length}개 장소 찾음`);
 
     const openai = new OpenAI({
-      apiKey: process.env.NEXT_PUBLIC_OPEN_AI_API_KEY,
+      apiKey: process.env.OPEN_AI_API_KEY,
     });
 
     const response = await openai.responses.parse({
@@ -409,8 +409,8 @@ export async function GET(_request: NextRequest) {
       startDate: plan.startDate,
       endDate: plan.endDate,
       personCount: plan.personCount,
-      tripTypes: JSON.parse(plan.tripTypes),
-      transports: JSON.parse(plan.transports),
+      tripTypes: plan.tripTypes,
+      transports: plan.transports,
       days: plan.days.map((day) => ({
         date: day.date,
         activities: day.activities.map((activity) => ({
