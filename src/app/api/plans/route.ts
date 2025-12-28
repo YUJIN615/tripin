@@ -20,7 +20,7 @@ interface KakaoApiPlace extends KakaoPlaceItem {
 }
 
 export async function POST(request: NextRequest) {
-  console.log("🚀 [API Route] POST /api/trips 호출됨");
+  console.log("🚀 [API Route] POST /api/plans 호출됨");
 
   try {
     const body = await request.json();
@@ -255,7 +255,7 @@ export async function POST(request: NextRequest) {
                           phone: { type: "string", description: "전화번호" },
                           id: { type: "string", description: "장소 ID" },
                         },
-                        required: ["time", "activity", "place"],
+                        required: ["time", "activity", "place_name"],
                       },
                     },
                   },
@@ -263,7 +263,7 @@ export async function POST(request: NextRequest) {
                 },
               },
             },
-            required: ["start_date", "end_date", "people", "type", "transport", "region", "days"],
+            required: ["start_date", "end_date", "personCount", "type", "transport", "region", "days"],
           },
         },
       },
@@ -290,8 +290,8 @@ export async function POST(request: NextRequest) {
     interface PlanItinerary {
       start_date: string;
       end_date: string;
-      people: number;
-      type: string;
+      personCount: number;
+      tripType: string;
       transport: string;
       region: string;
       days: PlanDayItinerary[];
@@ -314,7 +314,7 @@ export async function POST(request: NextRequest) {
           region: event.region || region,
           startDate: event.start_date,
           endDate: event.end_date,
-          personCount: event.people || personCount,
+          personCount: event.personCount || personCount,
           tripTypes: tripTypes,
           transports: transports,
           days: {
@@ -332,7 +332,7 @@ export async function POST(request: NextRequest) {
                   categoryGroupCode: activity.category_group_code,
                   categoryGroupName: activity.category_group_name,
                   phone: activity.phone || null,
-                  kakaoPlaceId: activity.id || "",
+                  kakaoPlaceId: activity.id || "NO_KAKAO_PLACE_ID_PROVIDED",
                 })),
               },
             })),

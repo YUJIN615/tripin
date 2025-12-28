@@ -18,16 +18,13 @@ export const TripPage = () => {
     queryFn: () => apiClient.get(API_ENDPOINTS.trips),
   });
 
-  const result = trips?.data.data as TripResponseType[];
+  const result = trips?.data.data as TripResponseType[] || [];
   console.log("result", result);
-
-  if (isLoading) return <div>Loading...</div>;
-  if (!result || result.length === 0) return <div>내 여행이 없습니다.</div>;
 
   return (
     <Layout title="내 여행">
       {isLoading && <div>여행 목록을 불러오는 중...</div>}
-      {!result || (result.length === 0 && <div>내 여행이 없습니다.</div>)}
+      {result && result.length === 0 && <div>내 여행이 없습니다.</div>}
       <ul className="flex flex-col">
         {result.map((item) => (
           <li key={item.id} className="flex flex-col gap-1 text-sm border-b border-gray-200 py-4">

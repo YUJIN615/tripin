@@ -108,7 +108,7 @@ export const ResultPage = () => {
     };
 
     loadData();
-  }, []);
+  }, [tripResultFromStore, setPlanResult]);
 
   // 로딩 중이거나 데이터가 없을 때
   if (isLoading) {

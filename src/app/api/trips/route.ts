@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: "Trip not created" }, { status: 500 });
     }
 
-    return NextResponse.json({ success: true, data: body });
+    return NextResponse.json({ success: true, data: trip });
   } catch (error) {
     console.error("❌ [API Route] 요청 실패:", error);
     return NextResponse.json({ success: false, error: "Failed to create trip" }, { status: 500 });

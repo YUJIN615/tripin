@@ -1,7 +1,7 @@
-import { API_ENDPOINTS, apiClient } from "@/lib/api";
-import { useMutation } from "@tanstack/react-query";
-import { TripDayRequestType, TripCreateResponseType } from "@/types/trip";
 import { DateRange } from "react-day-picker";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { API_ENDPOINTS, apiClient } from "@/lib/api";
+import { TripDayRequestType, TripCreateResponseType } from "@/types/trip";
 
 interface MakeTripParams {
   region: string;
@@ -13,6 +13,8 @@ interface MakeTripParams {
 }
 
 export const useMakeTrip = () => {
+  const queryClient = useQueryClient();
+
   return useMutation<TripCreateResponseType, Error, MakeTripParams>({
     mutationFn: async (params) => {
       const response = await apiClient.post(API_ENDPOINTS.trips, {
@@ -26,10 +28,11 @@ export const useMakeTrip = () => {
       return response.data;
     },
     onSuccess: () => {
-      console.log("✅ 일정 만들기 성공 및 localStorage 저장 완료");
+      queryClient.invalidateQueries({ queryKey: ["trips"] });
+      console.log("✅ 내 여행에 추가 성공");
     },
     onError: (error) => {
-      console.error("❌ 일정 만들기 실패:", error);
+      console.error("❌ 내 여행에 추가 실패:", error);
     },
   });
 };
