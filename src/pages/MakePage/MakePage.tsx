@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { DateRange, DayPicker } from "react-day-picker";
 import { ko } from "react-day-picker/locale";
 import { useMakeStore } from "@/stores/makePlanStore";
-import { useMakePlan } from "@/hooks/useMakePlan";
-import { Layout } from "@/components/common/Layout";
+import { useMakeTrip } from "@/hooks/useMakeTrip";
+import { Layout } from "@/components/layout/Layout";
 import { hasValue } from "@/utils/common";
 import { TRIP_PLACES, TRIP_CONCEPTS, PERSON_COUNT, TRANSPORT_TYPES } from "@/constants";
 import "react-day-picker/style.css";
@@ -32,10 +32,10 @@ export const MakePage = () => {
   const setSelectedTransports = useMakeStore((state) => state.setSelectedTransports);
 
   const clearAll = useMakeStore((state) => state.clearAll);
-  const setPlanResult = useMakeStore((state) => state.setPlanResult);
+  const setTripResult = useMakeStore((state) => state.setTripResult);
 
   // Tanstack Query mutation
-  const { mutate: makePlan, isPending } = useMakePlan();
+  const { mutate: makeTrip, isPending } = useMakeTrip();
 
   const selectDate = (value: DateRange | undefined) => {
     setDate(value);
@@ -83,7 +83,7 @@ export const MakePage = () => {
 
   // 일정 만들기 버튼 클릭 핸들러
   const handleMakeTrip = () => {
-    makePlan(
+    makeTrip(
       {
         region,
         date,
@@ -95,7 +95,7 @@ export const MakePage = () => {
         onSuccess: (data) => {
           console.log("✅ 일정 생성 성공:", data);
           // Zustand 스토어에도 저장 (선택사항)
-          setPlanResult(data);
+          setTripResult(data);
           // Result 페이지로 이동
           router.push("/result");
         },

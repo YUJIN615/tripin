@@ -1,32 +1,32 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Layout } from "@/components/common/Layout";
-import { useMakeStore } from "@/stores/makePlanStore";
-import { loadTripResultFromLocalStorage, useMakePlan } from "@/hooks/useMakePlan";
-import { useMakeTrip } from "@/hooks/useMakeTrip";
-import { getTripTypeNames, getTransportTypeNames } from "@/utils/tripUtils";
-import { PlanCreateResponseType } from "@/types/plan";
 import { useRouter } from "next/navigation";
+import { Layout } from "@/components/layout/Layout";
+import { useMakeStore } from "@/stores/makePlanStore";
+import { loadTripResultFromLocalStorage, useMakeTrip } from "@/hooks/useMakeTrip";
+import { useMakeMyTrip } from "@/hooks/useMakeMyTrip";
+import { getTripTypeNames, getTransportTypeNames } from "@/utils/tripUtils";
+import { TripCreateResponseType } from "@/types/trip";
 
 export const ResultPage = () => {
   const router = useRouter();
-  const tripResultFromStore = useMakeStore((state) => state.planResult);
-  const setPlanResult = useMakeStore((state) => state.setPlanResult);
+  const tripResultFromStore = useMakeStore((state) => state.tripResult);
+  const setTripResult = useMakeStore((state) => state.setTripResult);
 
-  const [planResult, setLocalTripResult] = useState<PlanCreateResponseType | null>(null);
+  const [tripResult, setLocalTripResult] = useState<TripCreateResponseType | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   // API 응답에서 실제 데이터 추출
-  const result = planResult?.data;
+  const result = tripResult?.data;
   console.log(result);
 
-  const { mutate: makePlan, isPending: isPendingMakePlan } = useMakePlan();
   const { mutate: makeTrip, isPending: isPendingMakeTrip } = useMakeTrip();
+  const { mutate: makeMyTrip, isPending: isPendingMakeMyTrip } = useMakeMyTrip();
 
   // 일정 다시 만들기
-  const handleRemakePlan = () => {
+  const handleRemakeTrip = () => {
     if (!result) return;
-    makePlan(
+    makeTrip(
       {
         region: result.region,
         date: {
@@ -41,7 +41,7 @@ export const ResultPage = () => {
         onSuccess: (data) => {
           console.log("✅ 일정 생성 성공:", data);
           // Zustand 스토어에도 저장 (선택사항)
-          setPlanResult(data);
+          setTripResult(data);
           // Result 페이지로 이동
           router.push("/result");
         },
@@ -54,20 +54,11 @@ export const ResultPage = () => {
   };
 
   // 내 여행에 추가
-  const savePlanResult = () => {
-    console.log("저장하기");
+  const saveMyTrip = () => {
     if (!result) return;
-    makeTrip(
+    makeMyTrip(
       {
-        region: result.region,
-        date: {
-          from: new Date(result.startDate),
-          to: new Date(result.endDate),
-        },
-        personCount: result.personCount,
-        tripTypes: result.tripTypes,
-        transports: result.transports,
-        days: result.days,
+        tripId: parseInt(result.id),
       },
       {
         onSuccess: (data) => {
@@ -98,7 +89,7 @@ export const ResultPage = () => {
       if (savedResult) {
         setLocalTripResult(savedResult);
         // 스토어에도 저장
-        setPlanResult(savedResult);
+        setTripResult(savedResult);
         setIsLoading(false);
         return;
       }
@@ -108,7 +99,7 @@ export const ResultPage = () => {
     };
 
     loadData();
-  }, [tripResultFromStore, setPlanResult]);
+  }, [tripResultFromStore, setTripResult]);
 
   // 로딩 중이거나 데이터가 없을 때
   if (isLoading) {
@@ -131,7 +122,7 @@ export const ResultPage = () => {
     );
   }
 
-  if (isPendingMakePlan) {
+  if (isPendingMakeTrip) {
     return (
       <Layout title="여행 일정">
         <div className="flex items-center justify-center h-64">
@@ -192,15 +183,15 @@ export const ResultPage = () => {
         <div className="flex items-center justify-between gap-2 pt-4 pb-4">
           <button
             className="w-2/6 h-12 bg-gray-200 text-gray-600 rounded-xl text-sm font-bold"
-            disabled={isPendingMakePlan}
-            onClick={handleRemakePlan}
+            disabled={isPendingMakeTrip || isPendingMakeMyTrip}
+            onClick={handleRemakeTrip}
           >
             다시 만들기
           </button>
           <button
             className="w-4/6 h-12 bg-blue-500 text-white rounded-xl text-sm font-bold disabled:bg-gray-400 disabled:cursor-not-allowed"
-            disabled={isPendingMakePlan}
-            onClick={savePlanResult}
+            disabled={isPendingMakeTrip || isPendingMakeMyTrip}
+            onClick={saveMyTrip}
           >
             내 여행에 추가
           </button>

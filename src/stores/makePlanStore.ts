@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { DateRange } from "react-day-picker";
 import { SearchItemType } from "@/types/make";
-import { PlanCreateResponseType } from "@/types/plan";
+import { TripCreateResponseType } from "@/types/trip";
 import { PERSON_COUNT } from "@/constants/tripOptions";
 import { apiClient, API_ENDPOINTS } from "@/lib/api"; // getSuggestValue에서 사용
 
@@ -19,7 +19,7 @@ interface MakeStore {
   searchValue: string;
   searchItems: SearchItemType[];
   searchHistory: SearchItemType[];
-  planResult: PlanCreateResponseType | null; // 일정 만들기 API 응답 결과
+  tripResult: TripCreateResponseType | null; // 일정 만들기 API 응답 결과
   setRegion: (value: string) => void;
   setDate: (value: DateRange | undefined) => void;
   setPersonCount: (value: number) => void;
@@ -32,7 +32,7 @@ interface MakeStore {
   removeSearchHistory: (id: number) => void;
   loadSearchHistory: () => void;
   clearAll: () => void;
-  setPlanResult: (result: PlanCreateResponseType | null) => void;
+  setTripResult: (result: TripCreateResponseType | null) => void;
 }
 
 export const useMakeStore = create<MakeStore>((set, get) => ({
@@ -45,7 +45,7 @@ export const useMakeStore = create<MakeStore>((set, get) => ({
   searchValue: "",
   searchItems: [],
   searchHistory: [],
-  planResult: null,
+  tripResult: null,
 
   setRegion: (value: string) => {
     set({ region: value });
@@ -154,7 +154,7 @@ export const useMakeStore = create<MakeStore>((set, get) => ({
   },
 
   // 일정 만들기 결과 저장
-  setPlanResult: (result: PlanCreateResponseType | null) => {
-    set({ planResult: result });
+  setTripResult: (result: TripCreateResponseType | null) => {
+    set({ tripResult: result });
   },
 }));
