@@ -1,5 +1,6 @@
-import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
+import { convertPlanResponse } from "@/utils/api/planConvertor";
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -17,31 +18,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     if (!plan) {
       return NextResponse.json({ success: false, error: "Plan not found" }, { status: 404 });
     }
-    const planResponse = {
-      id: plan.id,
-      region: plan.region,
-      startDate: plan.startDate,
-      endDate: plan.endDate,
-      personCount: plan.personCount,
-      tripTypes: plan.tripTypes,
-      transports: plan.transports,
-      days: plan.days.map((day) => ({
-        date: day.date,
-        activities: day.activities.map((activity) => ({
-          time: activity.time,
-          activity: activity.activity,
-          placeName: activity.placeName,
-          roadAddressName: activity.roadAddressName,
-          x: activity.x,
-          y: activity.y,
-          categoryName: activity.categoryName,
-          categoryGroupCode: activity.categoryGroupCode,
-          categoryGroupName: activity.categoryGroupName,
-          phone: activity.phone,
-          id: activity.kakaoPlaceId,
-        })),
-      })),
-    };
+    const planResponse = convertPlanResponse(plan);
     return NextResponse.json({ success: true, data: planResponse });
   } catch (error) {
     console.error("❌ [API Route] Plan detail error:", error);

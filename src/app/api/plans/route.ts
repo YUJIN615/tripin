@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getTripTypeNames } from "@/utils/tripUtils";
 import OpenAI from "openai";
 import prisma from "@/lib/prisma";
+import { convertPlanResponse } from "@/utils/api/planConvertor";
 
 interface KakaoPlaceItem {
   id?: string;
@@ -354,32 +355,8 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      // 응답 형식 변환
-      const planResponse = {
-        id: plan.id,
-        region: plan.region,
-        startDate: plan.startDate,
-        endDate: plan.endDate,
-        personCount: plan.personCount,
-        tripTypes: plan.tripTypes,
-        transports: plan.transports,
-        days: plan.days.map((day) => ({
-          date: day.date,
-          activities: day.activities.map((activity) => ({
-            time: activity.time,
-            activity: activity.activity,
-            placeName: activity.placeName,
-            roadAddressName: activity.roadAddressName,
-            x: activity.x,
-            y: activity.y,
-            categoryName: activity.categoryName,
-            categoryGroupCode: activity.categoryGroupCode,
-            categoryGroupName: activity.categoryGroupName,
-            phone: activity.phone,
-            id: activity.kakaoPlaceId,
-          })),
-        })),
-      };
+      // 응답 형식 변환 (Prisma 타입을 사용한 컨버터 함수 사용)
+      const planResponse = convertPlanResponse(plan);
 
       return NextResponse.json({
         success: true,
@@ -411,31 +388,8 @@ export async function GET(_request: NextRequest) {
         },
       },
     });
-    const plans = result.map((plan) => ({
-      id: plan.id,
-      region: plan.region,
-      startDate: plan.startDate,
-      endDate: plan.endDate,
-      personCount: plan.personCount,
-      tripTypes: plan.tripTypes,
-      transports: plan.transports,
-      days: plan.days.map((day) => ({
-        date: day.date,
-        activities: day.activities.map((activity) => ({
-          time: activity.time,
-          activity: activity.activity,
-          placeName: activity.placeName,
-          roadAddressName: activity.roadAddressName,
-          x: activity.x,
-          y: activity.y,
-          categoryName: activity.categoryName,
-          categoryGroupCode: activity.categoryGroupCode,
-          categoryGroupName: activity.categoryGroupName,
-          phone: activity.phone,
-          id: activity.kakaoPlaceId,
-        })),
-      })),
-    }));
+    // Prisma 타입을 사용한 컨버터 함수로 변환
+    const plans = result.map((plan) => convertPlanResponse(plan));
     return NextResponse.json({ success: true, data: plans });
   } catch (error) {
     console.error("❌ [API Route] Plan list error:", error);

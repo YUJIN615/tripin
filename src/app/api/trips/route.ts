@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { TripDayRequestType, TripActivityRequestType } from "@/types/trip";
+import { convertTripResponse } from "@/utils/api/tripConvertor";
+
 export async function POST(request: NextRequest) {
   console.log("🚀 [API Route] POST /api/trips 호출됨");
 
@@ -45,7 +47,7 @@ export async function POST(request: NextRequest) {
             },
           })),
         },
-      },  
+      },
     });
 
     if (!trip) {
@@ -63,9 +65,6 @@ export async function GET(request: NextRequest) {
   console.log("🚀 [API Route] GET /api/trips 호출됨");
   try {
     const result = await prisma.trip.findMany({
-      orderBy: {
-        createdAt: "desc",
-      },
       include: {
         days: {
           include: {
@@ -74,31 +73,7 @@ export async function GET(request: NextRequest) {
         },
       },
     });
-    const trips = result.map((trip) => ({
-      id: trip.id,
-      region: trip.region,
-      startDate: trip.startDate,
-      endDate: trip.endDate,
-      personCount: trip.personCount,
-      tripTypes: trip.tripTypes,
-      transports: trip.transports,
-      days: trip.days.map((day) => ({
-        date: day.date,
-        activities: day.activities.map((activity) => ({
-          time: activity.time,
-          activity: activity.activity,
-          placeName: activity.placeName,
-          roadAddressName: activity.roadAddressName,
-          x: activity.x,
-          y: activity.y,
-          categoryName: activity.categoryName,
-          categoryGroupCode: activity.categoryGroupCode,
-          categoryGroupName: activity.categoryGroupName,
-          phone: activity.phone,
-          id: activity.kakaoPlaceId,
-        })),
-      })),
-    }));
+    const trips = result.map((trip) => convertTripResponse(trip));
     return NextResponse.json({ success: true, data: trips });
   } catch (error) {
     console.error("❌ [API Route] trip list error:", error);
