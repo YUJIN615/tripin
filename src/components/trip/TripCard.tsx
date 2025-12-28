@@ -1,15 +1,7 @@
+import { TripResponseType } from "@/types/trip";
 import { getTripTypeNames, getTransportTypeNames } from "@/utils/tripUtils";
 
-export interface PlanCardProps {
-  region: string;
-  startDate: string;
-  endDate: string;
-  personCount: number;
-  tripTypes: string[];
-  transports: string[];
-}
-
-export const PlanCard = (item: PlanCardProps) => {
+export const TripCard = ({ item }: { item: TripResponseType }) => {
   const { region, startDate, endDate, personCount, tripTypes, transports } = item;
   return (
     <div className="px-2">

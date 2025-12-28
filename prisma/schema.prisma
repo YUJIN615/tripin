@@ -39,23 +39,7 @@ model Place {
   @@index([regionId, tripType])
 }
 
-// 일정 (사용자가 생성한 일정)
-model Plan {
-  id          Int         @id @default(autoincrement())
-  region      String
-  startDate   String      // ISO date string
-  endDate     String      // ISO date string
-  personCount Int
-  tripTypes   Json      // JSON array string
-  transports  Json      // JSON array string
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  days        PlanDay[]
-
-  @@index([createdAt])
-}
-
-// 여행 (사용자가 저장한 일정)
+// 여행
 model Trip {
   id          Int         @id @default(autoincrement())
   region      String
@@ -72,17 +56,6 @@ model Trip {
 }
 
 // 여행 일정의 각 날짜
-model PlanDay {
-  id        Int            @id @default(autoincrement())
-  planId    Int
-  plan      Plan           @relation(fields: [planId], references: [id], onDelete: Cascade)
-  date      String         // ISO date string
-  activities PlanActivity[]
-
-  @@index([planId])
-}
-
-// 여행 일정의 각 날짜 (Trip용)
 model TripDay {
   id        Int            @id @default(autoincrement())
   tripId    Int
@@ -94,26 +67,6 @@ model TripDay {
 }
 
 // 여행 일정의 각 활동
-model PlanActivity {
-  id                Int     @id @default(autoincrement())
-  planDayId         Int
-  planDay           PlanDay @relation(fields: [planDayId], references: [id], onDelete: Cascade)
-  time              String
-  activity          String
-  placeName         String
-  roadAddressName   String
-  x                 String
-  y                 String
-  categoryName      String
-  categoryGroupCode String
-  categoryGroupName String
-  phone             String?
-  kakaoPlaceId      String
-
-  @@index([planDayId])
-}
-
-// 여행 일정의 각 활동 (Trip용)
 model TripActivity {
   id                Int     @id @default(autoincrement())
   tripDayId         Int
@@ -131,4 +84,9 @@ model TripActivity {
   kakaoPlaceId      String
 
   @@index([tripDayId])
+}
+
+model MyTrip {
+  id               Int    @id @default(autoincrement())
+  tripId           Int
 }

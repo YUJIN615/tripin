@@ -5,6 +5,7 @@ import { convertTripResponse } from "@/utils/api/tripConvertor";
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
+    console.log("id", id);
     const trip = await prisma.trip.findUnique({
       where: { id: parseInt(id) },
       include: {

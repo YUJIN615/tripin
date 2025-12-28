@@ -21,8 +21,8 @@ export const apiClient = axios.create({
 // API 엔드포인트 설정
 export const API_ENDPOINTS = {
   regions: "/api/regions",
-  plans: "/api/plans",
   trips: "/api/trips",
-  planDetail: (id: string) => `/api/plans/${id}`,
+  myTrips: "/api/myTrips",
   tripDetail: (id: string) => `/api/trips/${id}`,
+  myTripDetail: (id: string) => `/api/myTrips/${id}`,
 };
