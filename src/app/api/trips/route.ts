@@ -340,7 +340,7 @@ export async function POST(request: NextRequest) {
                   categoryGroupCode: activity.category_group_code,
                   categoryGroupName: activity.category_group_name,
                   phone: activity.phone || null,
-                  kakaoPlaceId: activity.id || "NO_KAKAO_PLACE_ID_PROVIDED",
+                  kakaoPlaceId: activity.id || "",
                 })),
               },
             })),

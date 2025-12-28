@@ -14,7 +14,7 @@ export const Tab = ({
   return (
     <ul className="flex justify-between items-center">
       {TabList.map((tab) => (
-        <li className={`w-1/${TabList.length} text-center w-full`} key={tab.value}>
+        <li style={{ width: `${100 / TabList.length}%` }} className={`text-center w-full`} key={tab.value}>
           <button
             className={`text-sm py-4 w-full ${
               selectedTab === tab.value

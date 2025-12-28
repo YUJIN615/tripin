@@ -23,8 +23,6 @@ export const TripDetailWrapperPage = () => {
     };
   }, [id]);
 
-  console.log("id", id);
-
   const { data, isPending, isError } = useQuery<DetailData>({
     // ✅ enabled가 false일 때는 쿼리가 실행되지 않으므로 fallback 필요 없음
     queryKey: queryConfig?.queryKey ?? ["detail", "UNKNOWN", ""],
