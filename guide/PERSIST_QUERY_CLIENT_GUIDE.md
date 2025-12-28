@@ -100,10 +100,10 @@ export const QueryProvider = ({ children }: { children: ReactNode }) => {
 
 ### **2. Hook 수정**
 
-파일: `src/hooks/useMakeTrip.ts`
+파일: `src/hooks/useMakePlan.ts`
 
 ```typescript
-export const useMakeTrip = () => {
+export const useMakePlan = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -129,7 +129,7 @@ export const useTripResult = () => {
 ### **3. MakePage 수정**
 
 ```typescript
-const { mutate: makeTrip, isPending } = useMakeTrip();
+const { mutate: makeTrip, isPending } = useMakePlan();
 
 const handleMakeTrip = () => {
   makeTrip(
@@ -147,12 +147,12 @@ const handleMakeTrip = () => {
 
 ```typescript
 // ✅ 간단! useQuery만 사용
-const { data: tripResult, isLoading } = useTripResult();
+const { data: planResult, isLoading } = useTripResult();
 
 if (isLoading) return <Loading />;
-if (!tripResult) return <Empty />;
+if (!planResult) return <Empty />;
 
-return <TripDisplay data={tripResult} />;
+return <TripDisplay data={planResult} />;
 ```
 
 ---

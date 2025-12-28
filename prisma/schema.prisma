@@ -39,15 +39,15 @@ model Place {
   @@index([regionId, tripType])
 }
 
-// 여행 일정
+// 일정 (사용자가 생성한 일정)
 model Plan {
-  id          String      @id @default(uuid())
+  id          Int         @id @default(autoincrement())
   region      String
   startDate   String      // ISO date string
   endDate     String      // ISO date string
   personCount Int
-  tripTypes   String      // JSON array string
-  transports  String      // JSON array string
+  tripTypes   Json      // JSON array string
+  transports  Json      // JSON array string
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
   days        PlanDay[]
@@ -55,15 +55,42 @@ model Plan {
   @@index([createdAt])
 }
 
+// 여행 (사용자가 저장한 일정)
+model Trip {
+  id          Int         @id @default(autoincrement())
+  region      String
+  startDate   String      // ISO date string
+  endDate     String      // ISO date string
+  personCount Int
+  tripTypes   Json      // JSON array string
+  transports  Json      // JSON array string
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  days        TripDay[]
+
+  @@index([createdAt])
+}
+
 // 여행 일정의 각 날짜
 model PlanDay {
   id        Int            @id @default(autoincrement())
-  planId    String
+  planId    Int
   plan      Plan           @relation(fields: [planId], references: [id], onDelete: Cascade)
   date      String         // ISO date string
   activities PlanActivity[]
 
   @@index([planId])
+}
+
+// 여행 일정의 각 날짜 (Trip용)
+model TripDay {
+  id        Int            @id @default(autoincrement())
+  tripId    Int
+  trip      Trip           @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  date      String         // ISO date string
+  activities TripActivity[]
+
+  @@index([tripId])
 }
 
 // 여행 일정의 각 활동
@@ -84,4 +111,24 @@ model PlanActivity {
   kakaoPlaceId      String
 
   @@index([planDayId])
+}
+
+// 여행 일정의 각 활동 (Trip용)
+model TripActivity {
+  id                Int     @id @default(autoincrement())
+  tripDayId         Int
+  tripDay           TripDay @relation(fields: [tripDayId], references: [id], onDelete: Cascade)
+  time              String
+  activity          String
+  placeName         String
+  roadAddressName   String
+  x                 String
+  y                 String
+  categoryName      String
+  categoryGroupCode String
+  categoryGroupName String
+  phone             String?
+  kakaoPlaceId      String
+
+  @@index([tripDayId])
 }

@@ -32,9 +32,9 @@ export const BottomNav = () => {
       text: "새 일정",
     },
     {
-      path: "/plan",
+      path: "/trip",
       icon:
-        pathname === "/plan" ? (
+        pathname === "/trip" ? (
           <CalendarIconSolid className={iconClassName} />
         ) : (
           <CalendarIconOutline className={iconClassName} />
