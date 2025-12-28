@@ -63,6 +63,9 @@ export async function GET(request: NextRequest) {
   console.log("🚀 [API Route] GET /api/trips 호출됨");
   try {
     const result = await prisma.trip.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
       include: {
         days: {
           include: {

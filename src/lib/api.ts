@@ -23,4 +23,6 @@ export const API_ENDPOINTS = {
   regions: "/api/regions",
   plans: "/api/plans",
   trips: "/api/trips",
+  planDetail: (id: string) => `/api/plans/${id}`,
+  tripDetail: (id: string) => `/api/trips/${id}`,
 };

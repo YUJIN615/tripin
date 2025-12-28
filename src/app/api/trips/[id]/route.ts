@@ -4,7 +4,8 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    const plan = await prisma.plan.findUnique({
+    console.log("id", id);
+    const trip = await prisma.trip.findUnique({
       where: { id: parseInt(id) },
       include: {
         days: {
@@ -14,18 +15,18 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         },
       },
     });
-    if (!plan) {
-      return NextResponse.json({ success: false, error: "Plan not found" }, { status: 404 });
+    if (!trip) {
+      return NextResponse.json({ success: false, error: "Trip not found" }, { status: 404 });
     }
-    const planResponse = {
-      id: plan.id,
-      region: plan.region,
-      startDate: plan.startDate,
-      endDate: plan.endDate,
-      personCount: plan.personCount,
-      tripTypes: plan.tripTypes,
-      transports: plan.transports,
-      days: plan.days.map((day) => ({
+    const tripResponse = {
+      id: trip.id,
+      region: trip.region,
+      startDate: trip.startDate,
+      endDate: trip.endDate,
+      personCount: trip.personCount,
+      tripTypes: trip.tripTypes,
+      transports: trip.transports,
+      days: trip.days.map((day) => ({
         date: day.date,
         activities: day.activities.map((activity) => ({
           time: activity.time,
@@ -42,11 +43,11 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         })),
       })),
     };
-    return NextResponse.json({ success: true, data: planResponse });
+    return NextResponse.json({ success: true, data: tripResponse });
   } catch (error) {
-    console.error("❌ [API Route] Plan detail error:", error);
+    console.error("❌ [API Route] Trip detail error:", error);
     return NextResponse.json(
-      { success: false, error: "Failed to get plan detail" },
+      { success: false, error: "Failed to get trip detail" },
       { status: 500 }
     );
   }

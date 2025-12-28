@@ -263,7 +263,15 @@ export async function POST(request: NextRequest) {
                 },
               },
             },
-            required: ["start_date", "end_date", "personCount", "type", "transport", "region", "days"],
+            required: [
+              "start_date",
+              "end_date",
+              "personCount",
+              "type",
+              "transport",
+              "region",
+              "days",
+            ],
           },
         },
       },
@@ -307,7 +315,6 @@ export async function POST(request: NextRequest) {
     console.log("📅 [API Route] 생성된 일정:", JSON.stringify(event, null, 2));
 
     // 데이터베이스에 여행 일정 저장
-    let savedPlanId: string | null = null;
     try {
       const plan = await prisma.plan.create({
         data: {
@@ -346,8 +353,6 @@ export async function POST(request: NextRequest) {
           },
         },
       });
-      savedPlanId = plan.id;
-      console.log("💾 [API Route] 여행 일정 DB 저장 완료:", savedPlanId);
 
       // 응답 형식 변환
       const planResponse = {
@@ -395,6 +400,9 @@ export async function GET(_request: NextRequest) {
   console.log("🚀 [API Route] GET /api/plans 호출됨");
   try {
     const result = await prisma.plan.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
       include: {
         days: {
           include: {

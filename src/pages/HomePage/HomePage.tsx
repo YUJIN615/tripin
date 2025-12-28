@@ -13,9 +13,9 @@ export const HomePage = () => {
         <SearchArea />
       </div>
       <div className="-mt-4 pt-6 rounded-t-3xl bg-white shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
+        <Upcoming />
         <Recommend />
         <RecentlyView />
-        <Upcoming />
         <BottomNav />
       </div>
     </div>

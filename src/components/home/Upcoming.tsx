@@ -11,22 +11,22 @@ export const Upcoming = () => {
     {
       id: 1,
       title: "다가오는 여행 1",
-      image: "https://picsum.photos/200/300?random=24",
+      image: "https://picsum.photos/200/250?random=24",
     },
     {
       id: 2,
       title: "다가오는 여행 2",
-      image: "https://picsum.photos/200/300?random=25",
+      image: "https://picsum.photos/200/250?random=25",
     },
     {
       id: 3,
       title: "다가오는 여행 3",
-      image: "https://picsum.photos/200/300?random=26",
+      image: "https://picsum.photos/200/250?random=26",
     },
     {
       id: 4,
       title: "다가오는 여행 4",
-      image: "https://picsum.photos/200/300?random=27",
+      image: "https://picsum.photos/200/250?random=27",
     },
   ];
   return (
@@ -49,7 +49,7 @@ export const Upcoming = () => {
                 src={item.image}
                 alt={item.title}
                 width={200}
-                height={300}
+                height={250}
                 className="w-full h-full object-cover"
               />
             </div>
