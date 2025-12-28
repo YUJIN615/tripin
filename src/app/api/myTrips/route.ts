@@ -45,27 +45,31 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   console.log("🚀 [API Route] GET /api/myTrips 호출됨");
-  try {
 
-    const myTrips = await prisma.myTrip.findMany();
-    const result = await prisma.trip.findMany({
-      orderBy: {
-        createdAt: "desc",
-      },
-      where: {
-        id: {
-          in: myTrips.map((myTrip) => myTrip.tripId),
-        },
-      },
+  try {
+    const myTripsWithDetails = await prisma.myTrip.findMany({
       include: {
-        days: {
+        trip: {
           include: {
-            activities: true,
+            days: {
+              include: {
+                activities: true,
+              },
+            },
           },
         },
       },
+      orderBy: {
+        trip: {
+          createdAt: "desc",
+        },
+      },
     });
-    const trips = result.map((trip) => convertTripResponse(trip));
+    
+    const trips = myTripsWithDetails
+      .filter((myTrip) => myTrip.trip !== null)
+      .map((myTrip) => convertTripResponse(myTrip.trip));
+    
     return NextResponse.json({ success: true, data: trips });
   } catch (error) {
     console.error("❌ [API Route] my trip list error:", error);
