@@ -13,7 +13,7 @@ import { TripResponseType } from "@/types/trip";
 }>;
 
 /**
- * Prisma Plan 타입을 PlanResponseType으로 변환하는 함수
+ * Prisma Trip 타입을 TripResponseType으로 변환하는 함수
  */
 export const convertTripResponse = (trip: TripWithRelations): TripResponseType => {
   // tripTypes와 transports가 JSON 문자열일 수 있으므로 배열로 변환
