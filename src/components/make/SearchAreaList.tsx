@@ -2,7 +2,7 @@ import { useRouter } from "next/navigation";
 import { XMarkIcon } from "@heroicons/react/24/solid";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { SearchItemType, SearchListType } from "@/types/make";
-import { useMakeStore } from "@/stores/makeStore";
+import { useMakeStore } from "@/stores/makePlanStore";
 
 type SearchItemProps = {
   item: SearchItemType;

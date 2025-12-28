@@ -7,7 +7,7 @@ import { TRIP_PLACES, TRANSPORT_TYPES } from "@/constants";
  */
 export const getTripTypeNames = (values: string[]): string => {
   return values
-    .map((value) => TRIP_PLACES.find((type) => type.value === value)?.name)
+    .map((value) => TRIP_PLACES.find((type) => type.value === value.trim())?.name)
     .filter(Boolean)
     .join(", ");
 };
@@ -19,7 +19,7 @@ export const getTripTypeNames = (values: string[]): string => {
  */
 export const getTransportTypeNames = (values: string[]): string => {
   return values
-    .map((value) => TRANSPORT_TYPES.find((type) => type.value === value)?.name)
+    .map((value) => TRANSPORT_TYPES.find((type) => type.value === value.trim())?.name)
     .filter(Boolean)
     .join(", ");
 };
@@ -30,7 +30,7 @@ export const getTransportTypeNames = (values: string[]): string => {
  * @returns 이름 (예: "맛집") 또는 undefined
  */
 export const getTripTypeName = (value: string): string | undefined => {
-  return TRIP_PLACES.find((type) => type.value === value)?.name;
+  return TRIP_PLACES.find((type) => type.value === value.trim())?.name;
 };
 
 /**
@@ -39,5 +39,5 @@ export const getTripTypeName = (value: string): string | undefined => {
  * @returns 이름 (예: "대중교통") 또는 undefined
  */
 export const getTransportTypeName = (value: string): string | undefined => {
-  return TRANSPORT_TYPES.find((type) => type.value === value)?.name;
+  return TRANSPORT_TYPES.find((type) => type.value === value.trim())?.name;
 };

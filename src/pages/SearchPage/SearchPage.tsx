@@ -5,7 +5,7 @@ import { Layout } from "@/components/common/Layout";
 import { SearchInput } from "@/components/make/SearchAreaInput";
 import { SearchList } from "@/components/make/SearchAreaList";
 import { SearchHistoryList } from "@/components/make/SearchAreaHistoryList";
-import { useMakeStore } from "@/stores/makeStore";
+import { useMakeStore } from "@/stores/makePlanStore";
 import { MapPinIcon } from "@heroicons/react/24/solid";
 
 export const SearchPage = () => {
