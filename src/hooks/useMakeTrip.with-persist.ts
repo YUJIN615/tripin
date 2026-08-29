@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient, API_ENDPOINTS } from "@/lib/api";
-import { PlanCreateResponseType } from "@/types/plan";
+import { TripCreateResponseType } from "@/types/trip";
 import { DateRange } from "react-day-picker";
 
 interface MakeTripParams {
@@ -21,7 +21,7 @@ export const tripQueryKeys = {
 export const useMakePlan = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<PlanCreateResponseType, Error, MakeTripParams>({
+  return useMutation<TripCreateResponseType, Error, MakeTripParams>({
     mutationFn: async (params) => {
       const response = await apiClient.post(API_ENDPOINTS.trips, {
         region: params.region,
@@ -45,7 +45,7 @@ export const useMakePlan = () => {
 
 // ✅ 여행 결과 조회 Hook (persistQueryClient가 자동으로 localStorage에서 불러옴)
 export const useTripResult = () => {
-  return useQuery<PlanCreateResponseType | null>({
+  return useQuery<TripCreateResponseType | null>({
     queryKey: tripQueryKeys.result(),
     queryFn: () => {
       // queryFn은 실제로 실행되지 않음 (setQueryData로만 설정)

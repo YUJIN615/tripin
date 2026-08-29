@@ -3,15 +3,13 @@ import { MagnifyingGlassIcon } from "@heroicons/react/24/solid";
 
 export const SearchArea = () => {
   return (
-    <div className="w-full p-3">
+    <div className="px-5">
       <Link
         href="/search"
-        className="flex items-center gap-2 border border-gray-200 rounded-full p-3 bg-white"
+        className="flex items-center gap-2.5 bg-white border-[1.5px] border-ink rounded-xl px-4 py-3"
       >
-        <div className="w-5 h-5">
-          <MagnifyingGlassIcon className="w-5 h-5" />
-        </div>
-        <div className="text-[14px] text-gray-600">어디로 갈까요?</div>
+        <MagnifyingGlassIcon className="w-[19px] h-[19px] shrink-0 text-icon" />
+        <div className="font-mono text-[13px] text-muted">WHERE TO?</div>
       </Link>
     </div>
   );

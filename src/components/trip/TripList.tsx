@@ -1,7 +1,9 @@
+"use client";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { TripResponseType } from "@/types/trip";
 import { TripCard } from "./TripCard";
-import { useRouter } from "next/navigation";
+import { Button } from "@/components/common/Button";
 
 export const TripList = ({
   trips,
@@ -12,27 +14,35 @@ export const TripList = ({
 }) => {
   const router = useRouter();
 
+  if (isLoading) {
+    return (
+      <div className="py-16 text-center font-mono text-[13px] text-muted">
+        LOADING · 일정을 불러오는 중...
+      </div>
+    );
+  }
+
   return (
     <div>
-      {isLoading && <div>일정 목록을 불러오는 중...</div>}
-      {trips && trips.length === 0 && <div>일정이 없습니다.</div>}
-      <ul className="flex flex-col">
-        {trips.map((item) => (
-          <li key={item.id} className="border-b border-gray-200 py-4">
-            <Link href={`/trip/${item.id}`}>
-              <TripCard item={item} />
-            </Link>
-          </li>
-        ))}
-        <div className="my-8">
-          <button
-            className="w-full h-12 bg-blue-500 text-white font-bold rounded-xl text-sm"
-            onClick={() => router.push("/make")}
-          >
-            새 일정 만들기
-          </button>
+      {trips.length === 0 ? (
+        <div className="py-16 text-center font-mono text-[13px] text-muted">
+          NO TRIPS · 등록된 일정이 없습니다
         </div>
-      </ul>
+      ) : (
+        <ul className="flex flex-col gap-3">
+          {trips.map((item) => (
+            <li key={item.id}>
+              <Link href={`/trip/${item.id}`}>
+                <TripCard item={item} />
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <Button className="w-full mt-6" onClick={() => router.push("/make")}>
+        새 일정 만들기
+      </Button>
     </div>
   );
 };

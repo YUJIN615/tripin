@@ -1,8 +1,10 @@
 import { useRouter } from "next/navigation";
 import { XMarkIcon } from "@heroicons/react/24/solid";
-import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import { SearchItemType, SearchListType } from "@/types/make";
 import { useMakeStore } from "@/stores/makePlanStore";
+import { ListGroup, ListRow } from "@/components/common/ListGroup";
+import { getRegionCode } from "@/utils/regionCode";
 
 type SearchItemProps = {
   item: SearchItemType;
@@ -27,21 +29,29 @@ export const SearchItem = ({ item, type }: SearchItemProps) => {
   };
 
   return (
-    <li
-      key={item.id}
-      className="flex items-center justify-between w-full py-[8px] cursor-pointer hover:bg-gray-50 rounded-lg transition-colors"
+    <ListRow
+      className="flex justify-between items-center cursor-pointer hover:bg-canvas transition-colors"
       onClick={handleClick}
     >
-      <div className="flex items-center gap-2">
-        <MagnifyingGlassIcon className="w-5 h-5" color="#666" />
-        <div className="text-[14px] text-gray-600">{item.name}</div>
+      <div className="flex items-center gap-2.5">
+        <div className="w-[38px] font-mono text-[13px] font-semibold text-accent">
+          {getRegionCode(item.name)}
+        </div>
+        <div className="text-sm font-bold">{item.name}</div>
       </div>
-      {type === "history" && (
-        <button className="p-[4px] hover:bg-gray-200 rounded" onClick={handleRemove}>
+      {type === "history" ? (
+        <button
+          type="button"
+          aria-label={`${item.name} 최근 검색에서 삭제`}
+          className="p-1 text-muted"
+          onClick={handleRemove}
+        >
           <XMarkIcon className="w-4 h-4" />
         </button>
+      ) : (
+        <ChevronRightIcon className="w-4 h-4 text-muted" />
       )}
-    </li>
+    </ListRow>
   );
 };
 
@@ -52,10 +62,10 @@ type SearchListProps = {
 
 export const SearchList = ({ type, SearchItems = [] }: SearchListProps) => {
   return (
-    <ul className="flex flex-col gap-1 w-full bg-white px-1">
+    <ListGroup>
       {SearchItems.map((item) => (
         <SearchItem key={item.id} item={item} type={type} />
       ))}
-    </ul>
+    </ListGroup>
   );
 };

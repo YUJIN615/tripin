@@ -16,72 +16,47 @@ import {
   UserIcon as UserIconOutline,
 } from "@heroicons/react/24/outline";
 
+const BOTTOM_NAV_MENU = [
+  { path: "/make", label: "NEW", solid: PlusIconSolid, outline: PlusIconOutline },
+  { path: "/trip", label: "TRIPS", solid: CalendarIconSolid, outline: CalendarIconOutline },
+  { path: "/", label: "HOME", solid: HomeIconSolid, outline: HomeIconOutline },
+  { path: "/like", label: "LIKED", solid: HeartIconSolid, outline: HeartIconOutline },
+  { path: "/my", label: "ME", solid: UserIconSolid, outline: UserIconOutline },
+] as const;
+
+/** HOME 탭을 활성으로 표시할 경로 */
+const HOME_PATHS = ["/", "/search", "/map"];
+
 export const BottomNav = () => {
   const pathname = usePathname();
-  const iconClassName = "w-5 h-5 mb-0.5 text-gray-800";
-
-  const BottomNavMenu = [
-    {
-      path: "/make",
-      icon:
-        pathname === "/make" ? (
-          <PlusIconSolid className={iconClassName} />
-        ) : (
-          <PlusIconOutline className={iconClassName} />
-        ),
-      text: "새 일정",
-    },
-    {
-      path: "/trip",
-      icon:
-        pathname === "/trip" ? (
-          <CalendarIconSolid className={iconClassName} />
-        ) : (
-          <CalendarIconOutline className={iconClassName} />
-        ),
-      text: "내 여행",
-    },
-    {
-      path: "/",
-      icon:
-        pathname === "/" ? (
-          <HomeIconSolid className={iconClassName} />
-        ) : (
-          <HomeIconOutline className={iconClassName} />
-        ),
-      text: "홈",
-    },
-    {
-      path: "/like",
-      icon:
-        pathname === "/like" ? (
-          <HeartIconSolid className={iconClassName} />
-        ) : (
-          <HeartIconOutline className={iconClassName} />
-        ),
-      text: "좋아요",
-    },
-    {
-      path: "/my",
-      icon:
-        pathname === "/my" ? (
-          <UserIconSolid className={iconClassName} />
-        ) : (
-          <UserIconOutline className={iconClassName} />
-        ),
-      text: "마이",
-    },
-  ];
 
   return (
-    <footer className="fixed bottom-0 left-0 right-0 px-[32px] pt-[12px] pb-[12px] bg-white border-t border-gray-200 z-50">
+    <footer className="fixed bottom-0 left-0 right-0 px-7 pt-3 pb-4 bg-white border-t-[1.5px] border-ink z-50">
       <nav className="flex justify-between items-center">
-        {BottomNavMenu.map((menu) => (
-          <Link href={menu.path} className="flex flex-col items-center text-center" key={menu.path}>
-            {menu.icon}
-            <div className="text-[10px]">{menu.text}</div>
-          </Link>
-        ))}
+        {BOTTOM_NAV_MENU.map((menu) => {
+          // 하위 경로(/trip/[id])에서도 상위 탭이 활성으로 보이게 한다.
+          // 검색·지도는 홈에서 진입하므로 시안대로 HOME을 활성으로 표시한다.
+          const isActive =
+            menu.path === "/"
+              ? HOME_PATHS.includes(pathname ?? "")
+              : pathname?.startsWith(menu.path) === true;
+          const Icon = isActive ? menu.solid : menu.outline;
+
+          return (
+            <Link
+              href={menu.path}
+              key={menu.path}
+              className={`flex flex-col items-center gap-[3px] ${
+                isActive ? "text-ink" : "text-muted"
+              }`}
+            >
+              <Icon className="w-[22px] h-[22px]" strokeWidth={isActive ? undefined : 1.8} />
+              <div className={`font-mono text-[10px] ${isActive ? "font-semibold" : ""}`}>
+                {menu.label}
+              </div>
+            </Link>
+          );
+        })}
       </nav>
     </footer>
   );

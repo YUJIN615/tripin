@@ -1,73 +1,47 @@
 "use client";
-import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Scrollbar, Autoplay } from "swiper/modules";
+import { FreeMode } from "swiper/modules";
+import { SectionLabel } from "@/components/common/SectionLabel";
+import { ORIGIN_REGION_CODE, getRegionCode } from "@/utils/regionCode";
 import "swiper/css";
-import "swiper/css/scrollbar";
-import "swiper/css/pagination";
+import "swiper/css/free-mode";
+
+// TODO: 추천 코스 API 연동 시 교체
+const recommendItems = [
+  { id: 1, region: "제주", title: "제주 감성 카페 2박", tags: "CAFE 4 · NATURE 3" },
+  { id: 2, region: "부산", title: "부산 먹부림 1박", tags: "FOOD 5 · TRANSIT" },
+  { id: 3, region: "경주", title: "경주 고즈넉한 2박", tags: "CULTURE 4 · WALK" },
+  { id: 4, region: "여수", title: "여수 밤바다 1박", tags: "FOOD 3 · NIGHT" },
+];
 
 export const Recommend = () => {
-  const recommendItems = [
-    {
-      id: 1,
-      title: "추천 1",
-      image: "https://picsum.photos/300/150?random=1",
-    },
-    {
-      id: 2,
-      title: "추천 2",
-      image: "https://picsum.photos/300/150?random=2",
-    },
-    {
-      id: 3,
-      title: "추천 3",
-      image: "https://picsum.photos/300/150?random=13",
-    },
-    {
-      id: 4,
-      title: "추천 4",
-      image: "https://picsum.photos/300/150?random=15",
-    },
-    {
-      id: 5,
-      title: "추천 5",
-      image: "https://picsum.photos/300/150?random=5",
-    },
-    {
-      id: 6,
-      title: "추천 6",
-      image: "https://picsum.photos/300/150?random=6",
-    },
-  ];
   return (
-    <div className="recommend-container pb-3">
-      <h2 className="px-4 text-base font-bold my-3">이런 여행 코스는 어때요?</h2>
+    <section className="recommend-container pt-6">
+      <SectionLabel size="md" className="px-5 mb-2.5">
+        SUGGESTED · 추천 코스
+      </SectionLabel>
       <Swiper
-        scrollbar={{
-          hide: false,
-        }}
-        modules={[Autoplay, Scrollbar]}
-        spaceBetween={16}
-        slidesPerView={1.2}
-        pagination={{ clickable: true }}
-        loop={true}
-        autoplay={{ delay: 5000 }}
-        className="!pb-4"
+        modules={[FreeMode]}
+        freeMode={true}
+        slidesPerView="auto"
+        spaceBetween={12}
+        slidesOffsetBefore={20}
+        slidesOffsetAfter={20}
       >
         {recommendItems.map((item) => (
-          <SwiperSlide key={item.id}>
-            <div className="w-full h-[150px] ml-4 overflow-hidden rounded-lg">
-              <Image
-                src={item.image}
-                alt={item.title}
-                width={300}
-                height={150}
-                className="w-full h-full object-cover"
-              />
+          <SwiperSlide key={item.id} className="!w-[210px]">
+            <div className="bg-white rounded-group p-3.5 shadow-card">
+              <div className="flex justify-between font-mono text-[15px] font-semibold">
+                <div>{ORIGIN_REGION_CODE}</div>
+                <div className="text-muted">→</div>
+                <div>{getRegionCode(item.region)}</div>
+              </div>
+              <div className="text-sm font-bold mt-2.5">{item.title}</div>
+              <div className="font-mono text-[11px] text-muted mt-1">{item.tags}</div>
             </div>
           </SwiperSlide>
         ))}
       </Swiper>
-    </div>
+    </section>
   );
 };

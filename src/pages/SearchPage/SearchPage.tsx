@@ -22,18 +22,20 @@ export const SearchPage = () => {
   }, [loadSearchHistory]);
 
   return (
-    <Layout title="검색">
+    <Layout title="SEARCH">
       <SearchInput searchValue={searchValue} setSearchValue={setSearchValue} />
       {hasSearchValue ? (
-        <SearchList type="search" SearchItems={searchItems} />
+        <div className="mt-3.5">
+          <SearchList type="search" SearchItems={searchItems} />
+        </div>
       ) : (
         <>
           <Link
             href="/map"
-            className="flex items-center gap-2 w-[fit-content] text-xs my-2 pl-3 pr-3.5 py-2 rounded-3xl text-[#666] bg-white border border-gray-300"
+            className="flex items-center gap-[7px] w-fit mt-3.5 bg-white border border-line rounded-full px-3.5 py-2"
           >
-            <MapPinIcon className="w-4 h-4" color="skyblue" />
-            지도로 보기
+            <MapPinIcon className="w-4 h-4 text-icon" />
+            <div className="font-mono text-[11px] font-semibold tracking-[0.06em]">MAP VIEW</div>
           </Link>
           <SearchHistoryList SearchHistoryItems={searchHistory} />
         </>

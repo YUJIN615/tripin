@@ -4,15 +4,23 @@ import { BottomNav } from "./BottomNav";
 interface LayoutProps {
   children: React.ReactNode;
   showBottomNav?: boolean;
+  showBackButton?: boolean;
   className?: string;
+  /** 모노스페이스 대문자 제목 (예: "MY TRIPS") */
   title?: string;
 }
 
-export const Layout = ({ children, title, showBottomNav = true, className = "" }: LayoutProps) => {
+export const Layout = ({
+  children,
+  title,
+  showBottomNav = true,
+  showBackButton = true,
+  className = "",
+}: LayoutProps) => {
   return (
-    <div className={className}>
-      <Header title={title} />
-      <div className="px-4 pt-4 pb-16">{children}</div>
+    <div className={`min-h-screen bg-canvas ${className}`}>
+      <Header title={title} showBackButton={showBackButton} />
+      <div className="px-5 pt-2 pb-28">{children}</div>
       {showBottomNav && <BottomNav />}
     </div>
   );

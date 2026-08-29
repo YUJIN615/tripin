@@ -1,70 +1,34 @@
-"use client";
-import Image from "next/image";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { FreeMode } from "swiper/modules";
-import "swiper/css/free-mode";
+import Link from "next/link";
+import { SectionLabel } from "@/components/common/SectionLabel";
+import { ListGroup, ListRow } from "@/components/common/ListGroup";
+import { getRegionCode } from "@/utils/regionCode";
+
+// TODO: 최근 본 여행지 API 연동 시 교체
+const recentlyViewItems = [
+  { id: 1, region: "속초", viewedAt: "2일 전" },
+  { id: 2, region: "여수", viewedAt: "5일 전" },
+  { id: 3, region: "경주", viewedAt: "1주 전" },
+];
 
 export const RecentlyView = () => {
-  const recentlyViewItems = [
-    {
-      id: 1,
-      title: "최근 본 여행지 1",
-      image: "https://picsum.photos/150/150?random=4",
-    },
-    {
-      id: 2,
-      title: "최근 본 여행지 2",
-      image: "https://picsum.photos/150/150?random=5",
-    },
-    {
-      id: 3,
-      title: "최근 본 여행지 3",
-      image: "https://picsum.photos/150/150?random=6",
-    },
-    {
-      id: 4,
-      title: "최근 본 여행지 4",
-      image: "https://picsum.photos/150/150?random=7",
-    },
-    {
-      id: 5,
-      title: "최근 본 여행지 5",
-      image: "https://picsum.photos/150/150?random=8",
-    },
-    {
-      id: 6,
-      title: "최근 본 여행지 6",
-      image: "https://picsum.photos/150/150?random=9",
-    },
-  ];
   return (
-    <div className="recently-view-container pb-3">
-      <h2 className="px-4 text-base font-bold my-3">최근 본 여행지</h2>
-      <Swiper
-        modules={[FreeMode]}
-        freeMode={true}
-        slidesPerView={3}
-        spaceBetween={8}
-        style={{
-          paddingLeft: "16px",
-          paddingRight: "16px",
-        }}
-      >
+    <section className="px-5 pt-6">
+      <SectionLabel size="md" className="mb-2.5">
+        RECENT · 최근 본 여행지
+      </SectionLabel>
+      <ListGroup className="bg-[#e6f1fa] rounded-xl">
         {recentlyViewItems.map((item) => (
-          <SwiperSlide key={item.id}>
-            <div className="w-full h-full overflow-hidden rounded-md">
-              <Image
-                src={item.image}
-                alt={item.title}
-                width={150}
-                height={150}
-                className="w-full h-full object-cover"
-              />
+          <ListRow key={item.id} className="flex justify-between items-center">
+            <Link href="/search" className="text-sm font-bold">
+              {item.region}
+            </Link>
+            <div className="font-mono text-[11px] text-muted">
+              {getRegionCode(item.region)} · {item.viewedAt}
             </div>
-          </SwiperSlide>
+          </ListRow>
         ))}
-      </Swiper>
-    </div>
+      </ListGroup>
+    </section>
   );
 };
 

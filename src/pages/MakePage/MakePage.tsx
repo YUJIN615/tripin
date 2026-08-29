@@ -7,7 +7,12 @@ import { ko } from "react-day-picker/locale";
 import { useMakeStore } from "@/stores/makePlanStore";
 import { useMakeTrip } from "@/hooks/useMakeTrip";
 import { Layout } from "@/components/layout/Layout";
+import { Button } from "@/components/common/Button";
+import { Chip } from "@/components/common/Chip";
+import { SectionLabel } from "@/components/common/SectionLabel";
 import { hasValue } from "@/utils/common";
+import { getRegionCode } from "@/utils/regionCode";
+import { formatDateRange, getStayLabel } from "@/utils/tripFormat";
 import { TRIP_PLACES, TRIP_CONCEPTS, PERSON_COUNT, TRANSPORT_TYPES } from "@/constants";
 import "react-day-picker/style.css";
 
@@ -81,6 +86,15 @@ export const MakePage = () => {
     setIsOpenCalendar((prev) => !prev);
   };
 
+  // 인원 증감
+  const decreasePersonCount = () => {
+    setPersonCount(Math.max(PERSON_COUNT.MIN, personCount - 1));
+  };
+
+  const increasePersonCount = () => {
+    setPersonCount(Math.min(PERSON_COUNT.MAX, personCount + 1));
+  };
+
   // 일정 만들기 버튼 클릭 핸들러
   const handleMakeTrip = () => {
     makeTrip(
@@ -93,8 +107,7 @@ export const MakePage = () => {
       },
       {
         onSuccess: (data) => {
-          console.log("✅ 일정 생성 성공:", data);
-          // Zustand 스토어에도 저장 (선택사항)
+          // Zustand 스토어에도 저장
           setTripResult(data);
           // Result 페이지로 이동
           router.push("/result");
@@ -129,159 +142,163 @@ export const MakePage = () => {
     };
   }, [isOpenCalendar]);
 
-  return (
-    <Layout title="새 일정">
-      {isPending ? (
+  if (isPending) {
+    return (
+      <Layout title="NEW PLAN">
         <div className="flex items-center justify-center h-64">
-          <p className="text-gray-500">일정을 불러오는 중...</p>
+          <p className="font-mono text-[13px] text-muted">GENERATING · 일정을 만드는 중...</p>
         </div>
-      ) : (
-        <>
-          <>
-            <div className="mb-8">
-              <h3 className="text-base font-bold mb-3">지역</h3>
-              <Link
-                href="/search"
-                className="flex items-center gap-2 border border-gray-300 rounded-xl px-3 p-3 bg-white"
-              >
-                <div className={`text-sm ${hasValue(region) ? "text-gray-700" : "text-gray-400"}`}>
-                  {hasValue(region) ? region : "지역을 입력해주세요."}
-                </div>
-              </Link>
+      </Layout>
+    );
+  }
+
+  return (
+    <Layout title="NEW PLAN">
+      <div className="pb-[92px]">
+        <h2 className="text-[22px] font-bold leading-snug mb-5">
+          어떤 여행을
+          <br />
+          준비해볼까요?
+        </h2>
+
+        {/* 지역 */}
+        <Link
+          href="/search"
+          className="block bg-white rounded-field px-4 py-4 mb-2.5 shadow-card"
+        >
+          <SectionLabel className="mb-1.5">REGION · 지역</SectionLabel>
+          <div className="flex justify-between items-center">
+            <div className={`text-[17px] font-bold ${hasValue(region) ? "" : "text-muted"}`}>
+              {hasValue(region) ? region : "지역을 선택해주세요"}
             </div>
-            <div className="mb-8">
-              <h3 className="text-base font-bold mb-3">날짜</h3>
-              <div
-                ref={calendarContainerRef}
-                className="flex items-center gap-2 h-12 cursor-pointer border border-gray-300 rounded-xl px-3 text-sm text-gray-700 placeholder:text-gray-400"
-                onClick={toggleCalendar}
-              >
-                {date ? (
-                  <div className="flex items-center gap-2">
-                    <div className="text-gray-700">{date?.from?.toLocaleDateString()}</div>
-                    <div>~</div>
-                    <div className="text-gray-700">{date?.to?.toLocaleDateString()}</div>
-                  </div>
-                ) : (
-                  <div className="text-gray-400">날짜를 선택해주세요.</div>
-                )}
+            {hasValue(region) && (
+              <div className="font-mono text-[15px] font-semibold text-accent">
+                {getRegionCode(region)}
               </div>
-              {isOpenCalendar && (
-                <div ref={calendarRef} className="mt-2">
-                  <DayPicker
-                    mode="range"
-                    selected={date}
-                    onSelect={(value) => selectDate(value)}
-                    locale={ko}
-                  />
+            )}
+          </div>
+        </Link>
+
+        {/* 날짜 · 인원 */}
+        <div className="flex gap-2.5">
+          <div
+            ref={calendarContainerRef}
+            onClick={toggleCalendar}
+            className="flex-1 bg-white rounded-field px-4 py-4 shadow-card cursor-pointer"
+          >
+            <SectionLabel className="mb-1.5">DATE</SectionLabel>
+            {date?.from ? (
+              <>
+                <div className="font-mono text-[15px] font-semibold">
+                  {formatDateRange(date.from, date.to)}
                 </div>
-              )}
-            </div>
-            <div className="mb-8">
-              <h3 className="text-base font-bold mb-3">인원</h3>
-              <div className="mb-2 text-base font-bold text-gray-700">
-                {personCount}명 {personCount === PERSON_COUNT.MAX && "이상"}
+                <div className="text-xs text-muted mt-0.5">
+                  {getStayLabel(date.from, date.to)}
+                </div>
+              </>
+            ) : (
+              <div className="font-mono text-[15px] font-semibold text-muted">SELECT</div>
+            )}
+          </div>
+
+          <div className="w-[132px] shrink-0 bg-white rounded-field px-4 py-4 shadow-card">
+            <SectionLabel className="mb-1.5">PAX</SectionLabel>
+            <div className="flex items-center justify-between">
+              <button
+                type="button"
+                aria-label="인원 줄이기"
+                onClick={decreasePersonCount}
+                disabled={personCount === PERSON_COUNT.MIN}
+                className="w-6 h-6 rounded-full border-[1.5px] border-line text-muted font-bold flex items-center justify-center disabled:opacity-40"
+              >
+                −
+              </button>
+              <div className="text-base font-bold">
+                {personCount}
+                {personCount === PERSON_COUNT.MAX && "+"}
               </div>
-              <input
-                type="range"
-                min={PERSON_COUNT.MIN}
-                max={PERSON_COUNT.MAX}
-                value={personCount}
-                onChange={(e) => setPersonCount(parseInt(e.target.value))}
-                className="w-full h-2 range-custom"
+              <button
+                type="button"
+                aria-label="인원 늘리기"
+                onClick={increasePersonCount}
+                disabled={personCount === PERSON_COUNT.MAX}
+                className="w-6 h-6 rounded-full bg-accent text-white font-bold flex items-center justify-center disabled:opacity-40"
+              >
+                +
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {isOpenCalendar && (
+          <div ref={calendarRef} className="mt-2.5">
+            <DayPicker
+              mode="range"
+              selected={date}
+              onSelect={(value) => selectDate(value)}
+              locale={ko}
+            />
+          </div>
+        )}
+
+        {/* 여행 장소 */}
+        <div className="mt-6">
+          <SectionLabel className="mb-2.5">PLACES · 여행 장소</SectionLabel>
+          <div className="flex flex-wrap gap-2">
+            {TRIP_PLACES.map((type) => (
+              <Chip
+                key={type.id}
+                label={type.name}
+                selected={selectedTripPlaces.includes(type.value)}
+                onClick={() => toggleTripType(type.value)}
               />
-              <div className="flex items-center justify-between mt-1 text-[12px] text-gray-600">
-                <div>{PERSON_COUNT.MIN}</div>
-                <div>{PERSON_COUNT.MAX}명 이상</div>
-              </div>
-            </div>
-            <div className="mb-8">
-              <h3 className="text-base font-bold mb-3">여행 장소</h3>
-              <div className="flex items-center gap-2 flex-wrap">
-                {TRIP_PLACES.map((type) => (
-                  <div key={type.id}>
-                    <input
-                      type="checkbox"
-                      id={type.value}
-                      name="type"
-                      className="peer hidden"
-                      checked={selectedTripPlaces.includes(type.value)}
-                      onChange={() => toggleTripType(type.value)}
-                    />
-                    <label
-                      htmlFor={type.value}
-                      className="inline-block px-3 py-1.5 text-sm rounded-3xl border border-gray-300 text-gray-600 cursor-pointer transition-all hover:border-blue-400 peer-checked:bg-blue-500 peer-checked:text-white peer-checked:border-blue-500"
-                    >
-                      {type.name}
-                    </label>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="mb-8">
-              <h3 className="text-base font-bold mb-3">여행 컨셉</h3>
-              <div className="flex items-center gap-2 flex-wrap">
-                {TRIP_CONCEPTS.map((type) => (
-                  <div key={type.id}>
-                    <input
-                      type="checkbox"
-                      id={type.value}
-                      name="concept"
-                      className="peer hidden"
-                      checked={selectedTripConcepts.includes(type.value)}
-                      onChange={() => toggleTripConcept(type.value)}
-                    />
-                    <label
-                      htmlFor={type.value}
-                      className="inline-block px-3 py-1.5 text-sm rounded-3xl border border-gray-300 text-gray-600 cursor-pointer transition-all hover:border-blue-400 peer-checked:bg-blue-500 peer-checked:text-white peer-checked:border-blue-500"
-                    >
-                      {type.name}
-                    </label>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="mb-8">
-              <h3 className="text-base font-bold mb-3">이동 수단</h3>
-              <div className="flex items-center gap-2 flex-wrap">
-                {TRANSPORT_TYPES.map((type) => (
-                  <div key={type.id}>
-                    <input
-                      type="checkbox"
-                      id={type.value}
-                      name="transport"
-                      className="peer hidden"
-                      checked={selectedTransports.includes(type.value)}
-                      onChange={() => toggleTransport(type.value)}
-                    />
-                    <label
-                      htmlFor={type.value}
-                      className="inline-block px-3 py-1.5 text-sm rounded-3xl border border-gray-300 text-gray-600 cursor-pointer transition-all hover:border-blue-400 peer-checked:bg-blue-500 peer-checked:text-white peer-checked:border-blue-500"
-                    >
-                      {type.name}
-                    </label>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="flex items-center justify-between gap-2 pt-4 pb-4">
-              <button
-                className="w-2/6 h-12 bg-gray-200 text-gray-600 rounded-xl text-sm font-bold"
-                onClick={clearAll}
-              >
-                초기화
-              </button>
-              <button
-                className="w-4/6 h-12 bg-blue-500 text-white rounded-xl text-sm font-bold disabled:bg-gray-400 disabled:cursor-not-allowed"
-                onClick={handleMakeTrip}
-                disabled={isPending}
-              >
-                {isPending ? "생성 중..." : "일정 만들기"}
-              </button>
-            </div>
-          </>
-        </>
-      )}
+            ))}
+          </div>
+        </div>
+
+        {/* 여행 컨셉 */}
+        <div className="mt-6">
+          <SectionLabel className="mb-2.5">MOOD · 여행 컨셉</SectionLabel>
+          <div className="flex flex-wrap gap-2">
+            {TRIP_CONCEPTS.map((type) => (
+              <Chip
+                key={type.id}
+                label={type.name}
+                tone="badge"
+                selected={selectedTripConcepts.includes(type.value)}
+                onClick={() => toggleTripConcept(type.value)}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* 이동 수단 */}
+        <div className="mt-6">
+          <SectionLabel className="mb-2.5">TRANSPORT · 이동 수단</SectionLabel>
+          <div className="flex flex-wrap gap-2">
+            {TRANSPORT_TYPES.map((type) => (
+              <Chip
+                key={type.id}
+                label={type.name}
+                selected={selectedTransports.includes(type.value)}
+                onClick={() => toggleTransport(type.value)}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* 하단 고정 액션 */}
+      <div className="fixed left-0 right-0 bottom-[68px] px-5 py-3.5 bg-[linear-gradient(to_top,var(--color-canvas)_65%,transparent)]">
+        <div className="flex gap-2.5">
+          <Button variant="secondary" className="w-24" onClick={clearAll}>
+            초기화
+          </Button>
+          <Button className="flex-1" onClick={handleMakeTrip} disabled={isPending}>
+            일정 만들기
+          </Button>
+        </div>
+      </div>
     </Layout>
   );
 };

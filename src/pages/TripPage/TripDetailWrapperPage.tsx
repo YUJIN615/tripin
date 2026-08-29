@@ -1,12 +1,20 @@
 "use client";
-import { useParams } from "next/navigation";
-import { TripDetailPage } from "./TripDetailPage";
-import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
+import { useParams } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
+import { TripDetailPage } from "./TripDetailPage";
+import { Layout } from "@/components/layout/Layout";
 import { API_ENDPOINTS, apiClient } from "@/lib/api";
 import { TripResponseType } from "@/types/trip";
 
 type DetailData = TripResponseType;
+
+/** 일정 상세의 로딩 · 오류 상태 */
+const DetailMessage = ({ children }: { children: React.ReactNode }) => (
+  <Layout title="ITINERARY">
+    <div className="py-16 text-center font-mono text-[13px] text-muted">{children}</div>
+  </Layout>
+);
 
 export const TripDetailWrapperPage = () => {
   const params = useParams();
@@ -24,31 +32,23 @@ export const TripDetailWrapperPage = () => {
   }, [id]);
 
   const { data, isPending, isError } = useQuery<DetailData>({
-    // ✅ enabled가 false일 때는 쿼리가 실행되지 않으므로 fallback 필요 없음
-    queryKey: queryConfig?.queryKey ?? ["detail", "UNKNOWN", ""],
-    queryFn:
-      queryConfig?.queryFn ??
-      (async () => {
-        throw new Error("Invalid query configuration");
-      }),
-    enabled: !!queryConfig, // ✅ queryConfig가 null이면 쿼리 실행 안 함
+    queryKey: queryConfig.queryKey,
+    queryFn: queryConfig.queryFn,
   });
 
   if (isPending) {
-    return <div>일정 정보를 불러오는 중입니다...</div>;
+    return <DetailMessage>LOADING · 일정 정보를 불러오는 중입니다...</DetailMessage>;
   }
 
   if (isError) {
-    return <div>일정 정보를 불러오는 중에 오류가 발생했습니다.</div>;
+    return <DetailMessage>ERROR · 일정 정보를 불러오지 못했습니다</DetailMessage>;
   }
 
   if (!data) {
-    return <div>일정 정보를 찾을 수 없습니다.</div>;
+    return <DetailMessage>NOT FOUND · 일정 정보를 찾을 수 없습니다</DetailMessage>;
   }
 
-  return (
-    <div>
-      <TripDetailPage data={data} />
-    </div>
-  );
+  return <TripDetailPage data={data} />;
 };
+
+export default TripDetailWrapperPage;

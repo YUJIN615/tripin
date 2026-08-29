@@ -1,4 +1,5 @@
 import { SearchList } from "@/components/make/SearchAreaList";
+import { SectionLabel } from "@/components/common/SectionLabel";
 import { SearchItemType } from "@/types/make";
 
 type SearchHistoryListProps = {
@@ -6,14 +7,12 @@ type SearchHistoryListProps = {
 };
 
 export const SearchHistoryList = ({ SearchHistoryItems = [] }: SearchHistoryListProps) => {
+  if (SearchHistoryItems.length === 0) return null;
+
   return (
-    <>
-      {SearchHistoryItems.length > 0 && (
-        <div>
-          <h2 className="text-base font-bold py-3 px-1">최근 검색</h2>
-          <SearchList type="history" SearchItems={SearchHistoryItems} />
-        </div>
-      )}
-    </>
+    <div>
+      <SectionLabel className="mt-6 mb-2.5">RECENT · 최근 검색</SectionLabel>
+      <SearchList type="history" SearchItems={SearchHistoryItems} />
+    </div>
   );
 };

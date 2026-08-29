@@ -1,61 +1,44 @@
-"use client";
-import Image from "next/image";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { FreeMode } from "swiper/modules";
-import "swiper/css";
-import "swiper/css/scrollbar";
-import "swiper/css/free-mode";
+import Link from "next/link";
+import { SectionLabel } from "@/components/common/SectionLabel";
+import { BoardingPass } from "@/components/common/BoardingPass";
+import { ORIGIN_REGION_CODE, getRegionCode } from "@/utils/regionCode";
+import { formatDateRange, getDDayLabel, getPlanNo } from "@/utils/tripFormat";
+import { getTransportTypeNames } from "@/utils/tripUtils";
+
+// TODO: 다가오는 여행 API 연동 시 교체
+const upcomingTrip = {
+  id: "413",
+  region: "강릉",
+  startDate: "2026-10-03",
+  endDate: "2026-10-05",
+  personCount: 4,
+  transports: ["car"],
+  image: "https://picsum.photos/390/132?random=24",
+};
 
 export const Upcoming = () => {
-  const upcomingItems = [
-    {
-      id: 1,
-      title: "다가오는 여행 1",
-      image: "https://picsum.photos/200/250?random=24",
-    },
-    {
-      id: 2,
-      title: "다가오는 여행 2",
-      image: "https://picsum.photos/200/250?random=25",
-    },
-    {
-      id: 3,
-      title: "다가오는 여행 3",
-      image: "https://picsum.photos/200/250?random=26",
-    },
-    {
-      id: 4,
-      title: "다가오는 여행 4",
-      image: "https://picsum.photos/200/250?random=27",
-    },
-  ];
+  const { id, region, startDate, endDate, personCount, transports, image } = upcomingTrip;
+
   return (
-    <div className="recently-view-container pb-3">
-      <h2 className="px-4 text-base font-bold my-3">다가오는 여행</h2>
-      <Swiper
-        modules={[FreeMode]}
-        freeMode={true}
-        slidesPerView={2}
-        spaceBetween={8}
-        style={{
-          paddingLeft: "16px",
-          paddingRight: "16px",
-        }}
-      >
-        {upcomingItems.map((item) => (
-          <SwiperSlide key={item.id}>
-            <div className="w-full h-full overflow-hidden rounded-md">
-              <Image
-                src={item.image}
-                alt={item.title}
-                width={200}
-                height={250}
-                className="w-full h-full object-cover"
-              />
-            </div>
-          </SwiperSlide>
-        ))}
-      </Swiper>
-    </div>
+    <section className="px-5 pt-5">
+      <SectionLabel size="md" className="mb-2.5">
+        UPCOMING · 다가오는 여행
+      </SectionLabel>
+      <Link href={`/trip/${id}`}>
+        <BoardingPass
+          from={ORIGIN_REGION_CODE}
+          to={getRegionCode(region)}
+          badge={getDDayLabel(startDate, endDate)}
+          image={{ src: image, alt: region }}
+          meta={[
+            { label: "DATE", value: formatDateRange(startDate, endDate) },
+            { label: "PAX", value: `${personCount}명` },
+            { label: "MODE", value: getTransportTypeNames(transports) },
+          ]}
+          planNo={getPlanNo(id, region)}
+          action="일정 보기 →"
+        />
+      </Link>
+    </section>
   );
 };

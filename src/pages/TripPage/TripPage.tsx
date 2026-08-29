@@ -10,8 +10,8 @@ import { TripResponseType } from "@/types/trip";
 export const TripPage = () => {
   const [selectedTab, setSelectedTab] = useState<"MY_TRIP" | "TRIP">("MY_TRIP");
   const TabList = [
-    { title: "내 여행", value: "MY_TRIP" },
-    { title: "최근 조회한 일정", value: "TRIP" },
+    { title: "MY · 내 여행", value: "MY_TRIP" },
+    { title: "RECENT · 조회", value: "TRIP" },
   ];
 
   const { data: trips, isLoading: isLoadingTrips } = useQuery({
@@ -28,14 +28,21 @@ export const TripPage = () => {
   const myTripList = (myTrips?.data.data as TripResponseType[]) || [];
 
   return (
-    <Layout title="내 여행">
-      <Tab
-        selectedTab={selectedTab}
-        setSelectedTab={(tab) => setSelectedTab(tab as "MY_TRIP" | "TRIP")}
-        TabList={TabList}
-      />
-      {selectedTab === "MY_TRIP" && <TripList trips={myTripList} isLoading={isLoadingMyTrips} />}
-      {selectedTab === "TRIP" && <TripList trips={tripList} isLoading={isLoadingTrips} />}
+    <Layout title="MY TRIPS">
+      <div className="pt-1">
+        <Tab
+          selectedTab={selectedTab}
+          setSelectedTab={(tab) => setSelectedTab(tab as "MY_TRIP" | "TRIP")}
+          TabList={TabList}
+        />
+      </div>
+      <div className="mt-4.5">
+        {selectedTab === "MY_TRIP" ? (
+          <TripList trips={myTripList} isLoading={isLoadingMyTrips} />
+        ) : (
+          <TripList trips={tripList} isLoading={isLoadingTrips} />
+        )}
+      </div>
     </Layout>
   );
 };
