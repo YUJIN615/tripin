@@ -92,3 +92,63 @@ model MyTrip {
   tripId           Int
   trip             Trip   @relation(fields: [tripId], references: [id])
 }
+// ───────────────────────────────────────────────
+// Auth.js (next-auth) 모델
+// @auth/prisma-adapter가 요구하는 스키마입니다.
+// 세션을 DB에서 관리하므로(strategy: "database") Session 테이블이 필요합니다.
+// ───────────────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  accounts      Account[]
+  sessions      Session[]
+}
+
+// OAuth 제공자 계정 (구글 토큰 보관)
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // 어댑터가 provider_providerAccountId 복합 키로 조회합니다
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+// 로그인 세션 — row를 지우면 즉시 로그아웃됩니다
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  // 어댑터가 identifier_token 복합 키로 조회합니다
+  @@unique([identifier, token])
+}
